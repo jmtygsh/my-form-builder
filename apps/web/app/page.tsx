@@ -1,12 +1,28 @@
-import { api } from "~/trpc/server";
+"use client";
 
-export default async function Home() {
-  const { status } = await api.health.getHealth.query();
+import { useEffect } from "react";
+import { useUser } from "~/hooks/api/auth";
+import { redirect, RedirectType } from 'next/navigation'
+
+
+export default function Home() {
+
+  const { user } = useUser()
+
+  useEffect(() => {
+    if (user && user.id) {
+      console.log(user)
+
+      // redirect('/redirect-to', RedirectType.replace)
+    }
+  }, [user])
+
   return (
     <main className="min-h-screen min-w-screen flex justify-center items-center">
       <div>
         <h1 className="text-3xl">Streamyst - Stream in Style</h1>
-        <h2>Server Status: {status}</h2>
+
+
       </div>
     </main>
   );
