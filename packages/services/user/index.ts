@@ -113,7 +113,8 @@ class UserService {
     const { token: verificationToken } = await this.generateUserToken({ id: userId });
 
     // send email for verification
-    await EmailService.sendEmailVerificationEmail(email, verificationToken);
+    console.log(`verificationToken: ${verificationToken}`)
+    // await EmailService.sendEmailVerificationEmail(email, verificationToken);
 
 
     const { token } = await this.generateUserToken({ id: userId });
@@ -195,7 +196,10 @@ class UserService {
     }).returning({ id: passwordResetTokensTable.id })
 
     // send email for reset password
-    await EmailService.sendResetPasswordEmail(email, resetPasswordToken);
+    // await EmailService.sendResetPasswordEmail(email, resetPasswordToken);
+    console.log(`resetPasswordToken: ${resetPasswordToken}`)
+
+
 
     const message = "Reset password token sent to your email address."
     return { message };

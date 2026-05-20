@@ -2,66 +2,62 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { toast } from "sonner";
+import { Eye, EyeOff, ChevronLeft } from "lucide-react";
 
 import { cn } from "../lib/utils";
 import { Button } from "./ui/button";
-import { Card, CardContent } from "./ui/card";
 import {
     Field,
-    FieldDescription,
     FieldError,
     FieldGroup,
     FieldLabel,
-    FieldSeparator,
 } from "./ui/field";
 import { Input } from "./ui/input";
+import { Checkbox } from "./ui/checkbox";
 
 import { useSignUp } from "~/hooks/api/auth";
+
 
 type SignUpFormValues = {
     fullname: string;
     email: string;
     password: string;
-    confirmpassword: string;
+    terms: boolean;
 };
-
 
 
 export function SignUpForm({
     className,
     ...props
 }: React.ComponentPropsWithoutRef<"div">) {
-
     const router = useRouter();
-
     const { createUserWithEmailAndPasswordAsync } = useSignUp();
     const [submitError, setSubmitError] = useState<string | null>(null);
+    const [showPassword, setShowPassword] = useState(false);
 
     const {
         register,
         handleSubmit,
-        formState: { errors, isSubmitting, },
-        getValues
+        control,
+        formState: { errors, isSubmitting },
     } = useForm<SignUpFormValues>({
         defaultValues: {
             fullname: "",
             email: "",
             password: "",
-            confirmpassword: ""
+            terms: false,
         },
-        mode: "onTouched"
+        mode: "onSubmit"
     });
-
 
     const submitForm = async (data: SignUpFormValues) => {
         setSubmitError(null);
 
-        if (data.password !== data.confirmpassword) {
-            toast.error("password not match");
+        if (!data.terms) {
+            toast.error("Please accept the terms");
             return;
         }
 
@@ -82,172 +78,271 @@ export function SignUpForm({
         }
     }
 
-
-    const signUpWithGoogle = async () => {
-    };
-
-    const signUpWithGithub = async () => {
-    };
-
-
-
-
     return (
-        <div className={cn("flex flex-col gap-6", className)} {...props}>
-            <Card className="overflow-hidden p-0">
-                <CardContent className="grid p-0 md:grid-cols-2">
-                    <form className="p-6 md:p-8" onSubmit={handleSubmit(submitForm)}>
-                        <FieldGroup>
-                            <div className="flex flex-col items-center gap-2 text-center">
-                                <h1 className="text-2xl font-bold">Create your account</h1>
-                                <p className="text-muted-foreground text-sm text-balance">
-                                    Enter your email below to create your account
-                                </p>
+        <div className={cn("min-h-screen w-full bg-background text-foreground flex", className)} {...props}>
+
+            <div className="flex-1 flex flex-col relative">
+                {/* Back Button */}
+                <div className="absolute top-6 left-6">
+                    <Button
+                        variant="outline"
+                        size="icon"
+                        className="h-9 w-9 bg-background-secondary border-border text-foreground-muted hover:text-foreground hover:bg-card hover:border-border-hover rounded-lg"
+                        asChild
+                    >
+                        <Link href="/">
+                            <ChevronLeft className="h-5 w-5" />
+                        </Link>
+                    </Button>
+
+
+                </div>
+
+
+
+                <div className="flex-1 flex flex-col items-center justify-center p-8 relative">
+                    <div className="w-full max-w-[360px] ">
+
+                        <div className="flex items-center justify-center gap-2.5 mb-6 absolute top-10 left-1/2 -translate-x-1/2">
+                            <div className="w-5 h-5 bg-foreground rotate-45 flex items-center justify-center rounded-[3px]">
+                                <div className="w-1.5 h-1.5 bg-background rounded-[1px] -rotate-45" />
                             </div>
+                            <span className="font-bold text-xl tracking-tight text-foreground dark:text-white">MakeMyForm</span>
+                        </div>
+                        <h1 className="text-center text-xl font-medium text-foreground mb-12">Create your account for free!</h1>
 
-                            <Field>
-                                <FieldLabel htmlFor="fullname">Full name</FieldLabel>
-                                <Input
-                                    id="fullname"
-                                    type="text"
-                                    placeholder="your name"
-                                    required
-                                    {...register("fullname", { required: "full name is required" })}
-                                    disabled={isSubmitting}
-                                />
-                                <FieldError errors={[errors.fullname]} />
 
-                            </Field>
+                        {/* Form */}
+                        <form onSubmit={handleSubmit(submitForm)} className="space-y-4">
+                            <FieldGroup className="space-y-4">
+                                <Field>
+                                    <FieldLabel htmlFor="fullname" className="text-[13px] text-foreground font-normal">Full Name</FieldLabel>
+                                    <Input
+                                        id="fullname"
+                                        type="text"
+                                        placeholder="Please enter full name"
+                                        className="bg-transparent border-border text-[13px] text-foreground placeholder:text-foreground-placeholder focus-visible:ring-ring focus-visible:border-primary h-10 rounded-lg"
+                                        {...register("fullname", { required: "Full name is required" })}
+                                        disabled={isSubmitting}
+                                    />
+                                    <FieldError errors={[errors.fullname]} />
+                                </Field>
 
-                            <Field>
-                                <FieldLabel htmlFor="email">Email </FieldLabel>
-                                <Input
-                                    id="email"
-                                    type="email"
-                                    placeholder="your email"
-                                    required
-                                    {...register("email", { required: "email is required", })}
-                                    disabled={isSubmitting}
-                                />
-                                <FieldError errors={[errors.email]} />
+                                <Field>
+                                    <FieldLabel htmlFor="email" className="text-[13px] text-foreground font-normal">Email</FieldLabel>
+                                    <Input
+                                        id="email"
+                                        type="email"
+                                        placeholder="example@domain.com"
+                                        className="bg-transparent border-border text-[13px] text-foreground placeholder:text-foreground-muted focus-visible:ring-ring focus-visible:border-primary h-10 rounded-lg"
+                                        {...register("email", { required: "Email is required" })}
+                                        disabled={isSubmitting}
+                                    />
+                                    <FieldError errors={[errors.email]} />
+                                </Field>
 
-                            </Field>
-
-                            <Field>
-                                <Field className="grid grid-cols-2 gap-4">
-                                    <Field>
-                                        <FieldLabel htmlFor="password">Password</FieldLabel>
+                                <Field>
+                                    <FieldLabel htmlFor="Password" className="text-[13px] text-foreground font-normal">Password</FieldLabel>
+                                    <div className="relative">
                                         <Input
-                                            id="password"
-                                            type="password"
-
-                                            required
+                                            id="Password"
+                                            type={showPassword ? "text" : "password"}
+                                            placeholder="Please enter your password"
+                                            className="bg-transparent border-border text-[13px] text-foreground placeholder:text-foreground-muted focus-visible:ring-ring focus-visible:border-primary h-10 rounded-lg"
                                             {...register("password", {
-                                                required: "password is required",
+                                                required: "Password is required",
                                                 minLength: {
                                                     value: 6,
-                                                    message: "password must be at least 6 characters",
+                                                    message: "Password must be at least 6 characters",
                                                 },
                                             })}
                                             disabled={isSubmitting}
                                         />
-                                        <FieldError errors={[errors.password]} />
-                                    </Field>
-                                    <Field>
-                                        <FieldLabel htmlFor="confirm-password">
-                                            Confirm Password
-                                        </FieldLabel>
-                                        <Input
-                                            id="confirm-password"
-                                            type="password"
-                                            required
-                                            {...register("confirmpassword", {
-                                                required: "confirm password is required",
-                                                validate: (value) =>
-                                                    value === getValues("password") || "password not match",
-                                            })}
-                                            disabled={isSubmitting}
-                                        />
-                                        <FieldError errors={[errors.confirmpassword]} />
-
-                                    </Field>
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowPassword(!showPassword)}
+                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground-muted hover:text-foreground transition-colors"
+                                        >
+                                            {showPassword ? (
+                                                <Eye className="h-4 w-4" />
+                                            ) : (
+                                                <EyeOff className="h-4 w-4" />
+                                            )}
+                                        </button>
+                                    </div>
+                                    <FieldError errors={[errors.password]} />
                                 </Field>
-                            </Field>
-                            <FieldError>{submitError}</FieldError>
-                            <Field>
-                                <Button type="submit" className="w-full" disabled={isSubmitting}>
-                                    {isSubmitting ? "Creating account..." : "Create Account"}
-                                </Button>
-                            </Field>
-                            <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
-                                Or continue with
-                            </FieldSeparator>
-                            <Field className="grid grid-cols-2 gap-4">
+
+
+
+
+                                <Field className="pt-2">
+                                    <div className="flex items-start space-x-3">
+                                        <Controller
+                                            name="terms"
+                                            control={control}
+                                            rules={{ required: "You must agree to the terms" }}
+                                            render={({ field }) => (
+                                                <Checkbox
+                                                    id="terms"
+                                                    checked={field.value}
+                                                    onCheckedChange={field.onChange}
+                                                    disabled={isSubmitting}
+                                                    className="mt-1 border-border data-[state=checked]:bg-primary data-[state=checked]:border-primary rounded-[4px]"
+                                                />
+                                            )}
+                                        />
+                                        <label
+                                            htmlFor="terms"
+                                            className="text-sm text-foreground-muted font-normal leading-relaxed"
+                                        >
+                                            I agree to the MakeMyForm's <Link href="/terms" className="text-foreground underline underline-offset-2 hover:text-primary">Terms of Use</Link> and <Link href="/privacy" className="text-foreground underline underline-offset-2 hover:text-primary">Privacy Policy</Link>.
+                                        </label>
+                                    </div>
+                                    <FieldError errors={[errors.terms]} />
+                                </Field>
+
+                                <FieldError>{submitError}</FieldError>
 
                                 <Button
-                                    variant="outline"
-                                    type="button"
-                                    onClick={signUpWithGoogle}
+                                    type="submit"
+                                    className="w-full bg-button hover:bg-button-hover text-button-foreground h-10 text-sm font-medium rounded-lg mt-2 transition-colors border-0"
                                     disabled={isSubmitting}
                                 >
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        viewBox="0 0 24 24"
-                                        width="24"
-                                        height="24"
-                                    >
-                                        <path
-                                            fill="#4285F4"
-                                            d="M23.64 12.204c0-.793-.07-1.554-.2-2.284H12v4.318h6.32c-.272 1.44-1.088 2.66-2.32 3.474v2.88h3.74c2.184-2.014 3.46-4.978 3.46-8.388z"
-                                        />
-                                        <path
-                                            fill="#34A853"
-                                            d="M12 24c3.24 0 5.966-1.074 7.954-2.914l-3.74-2.88c-1.04.694-2.36 1.102-4.214 1.102-3.24 0-5.987-2.19-6.964-5.138H1.22v3.09C3.196 21.51 7.38 24 12 24z"
-                                        />
-                                        <path
-                                            fill="#FBBC05"
-                                            d="M5.036 14.224c-.242-.694-.38-1.432-.38-2.184s.138-1.49.38-2.184V6.766H1.22C.44 8.034 0 9.482 0 11s.44 2.966 1.22 4.234l3.816-1.01z"
-                                        />
-                                        <path
-                                            fill="#EA4335"
-                                            d="M12 4.84c1.762 0 3.344.606 4.588 1.796l3.438-3.438C17.964 1.094 15.24 0 12 0 7.38 0 3.196 2.49 1.22 6.766l3.816 3.09C6.013 7.03 8.76 4.84 12 4.84z"
-                                        />
-                                    </svg>
-                                    <span className="sr-only">Sign up with Google</span>
+                                    {isSubmitting ? "Signing up..." : "Sign up for free"}
                                 </Button>
+                            </FieldGroup>
+                        </form>
 
-                                <Button variant="outline" type="button" onClick={signUpWithGithub} disabled={isSubmitting}>
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                                        <path
-                                            d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"
-                                            fill="currentColor"
-                                        />
-                                    </svg>
-
-                                </Button>
-                            </Field>
-                            <FieldDescription className="text-center">
-                                Already have an account?{" "}
-                                <Link href="/login">Sign in</Link>
-                            </FieldDescription>
-                        </FieldGroup>
-                    </form>
-                    <div className="bg-muted relative hidden md:block">
-                        <Image
-                            src="/assets/sign-up.jpg"
-                            alt="Sign Up Image"
-                            fill
-                            className="object-cover"
-                            priority
-                        />
+                        <div className="mt-8 text-center text-sm text-foreground-muted">
+                            Already have an account?{" "}
+                            <Link href="/login" className="text-primary hover:text-primary-hover font-medium">
+                                Login
+                            </Link>
+                        </div>
                     </div>
-                </CardContent>
-            </Card>
-            <FieldDescription className="px-6 text-center">
-                By clicking continue, you agree to our{" "}
-                <Link href="/test-term">Terms of Service</Link> and{" "}
-                <Link href="/test-term">Privacy Policy</Link>.
-            </FieldDescription>
+                </div>
+            </div>
+
+
+            <div className="hidden lg:block w-[48%] max-w-3xl p-4 pl-0">
+                <div className="w-full h-full bg-background-secondary rounded-xl p-12 flex flex-col relative overflow-hidden">
+
+                    <div className="max-w-xl mx-auto w-full pt-12 relative z-10">
+                        <h2 className="text-[34px] font-medium leading-tight mb-4 text-heading">
+                            Create your forms<br />
+                            <span className="text-primary  dark:text-blue-500">Get results in minutes</span>
+
+                        </h2>
+                        <p className="text-foreground text-[14px] leading-relaxed mb-12">
+                            makemyform.in is a great tool to get started with your forms. Build your forms in minutes and connect them to your favorite apps.
+                        </p>
+
+                        {/* Form Builder Mock UI */}
+                        <div className="relative w-full aspect-4/3 mt-8">
+                            <div className="absolute inset-0 bg-background rounded-2xl shadow-2xl overflow-hidden border border-border">
+                                {/* Form Builder Header */}
+                                <div className="h-14 border-b border-border flex items-center justify-between px-6 bg-card">
+                                    <div className="flex gap-10 text-[11px] font-medium text-foreground-muted">
+                                        <div className="flex flex-col items-center gap-1.5 text-primary relative cursor-pointer">
+                                            <div className="w-3.5 h-3.5 bg-primary/10 rounded-[3px]"></div>
+                                            Build
+                                        </div>
+
+                                        <div className="flex flex-col items-center gap-1.5 cursor-pointer">
+                                            <div className="w-3.5 h-3.5 bg-foreground-muted/20 rounded-[3px]"></div>
+                                            Share
+                                        </div>
+                                        <div className="flex flex-col items-center gap-1.5 cursor-pointer">
+                                            <div className="w-3.5 h-3.5 bg-foreground-muted/20 rounded-[3px]"></div>
+                                            Results
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-6 h-6 rounded-full bg-background-secondary flex items-center justify-center border border-border">
+                                            <div className="w-3 h-3 bg-foreground-muted rounded-[2px]"></div>
+                                        </div>
+                                        <div className="h-7 px-3 bg-primary text-primary-foreground text-[11px] font-medium rounded-md flex items-center justify-center">
+                                            Publish
+                                        </div>
+                                    </div>
+                                </div>
+                                {/* Form Builder Content */}
+                                <div className="flex h-full p-5 gap-5 bg-background">
+                                    {/* Sidebar mock (Field Types) */}
+                                    <div className="w-[160px] flex flex-col gap-3 bg-card p-3 rounded-xl border border-border shadow-sm h-fit">
+                                        <div className="text-[10px] font-semibold text-foreground-muted mb-1">Basic Fields</div>
+                                        {[
+                                            { icon: 'T', name: 'Short Text' },
+                                            { icon: '≡', name: 'Long Text' },
+
+                                            { icon: '▼', name: 'Dropdown' },
+                                            { name: 'More..' },
+                                        ].map((field, i) => (
+                                            <div key={i} className="flex items-center gap-2.5 p-1.5 rounded-md hover:bg-background-secondary cursor-pointer">
+                                                <div className="w-5 h-5 bg-background-secondary text-foreground-muted text-[10px] font-bold rounded flex items-center justify-center">
+                                                    {field.icon}
+                                                </div>
+                                                <div className="text-[10px] text-foreground font-medium">{field.name}</div>
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    {/* Form Canvas mock */}
+                                    <div className="flex-1 flex flex-col gap-4 mx-auto">
+                                        {/* Form Title */}
+                                        <div className="bg-card p-4 rounded-xl border border-border hover:border-primary shadow-sm">
+                                            <div className="w-3/4 h-5 bg-background-secondary rounded mb-2"></div>
+                                            <div className="w-full h-2.5 bg-background-secondary rounded"></div>
+                                        </div>
+
+
+
+                                        {/* Form Field 2 (Active/Selected) */}
+                                        <div className="bg-card p-4 rounded-xl shadow-sm border border-primary relative">
+                                            {/* Selection Handle */}
+                                            <div className="absolute -left-2 top-1/2 -translate-y-1/2 w-1 h-8 bg-primary rounded-r-md"></div>
+                                            <div className="w-1/2 h-3.5 bg-primary/80 rounded mb-3"></div>
+                                            <div className="flex flex-col gap-2">
+                                                <div className="flex items-center gap-2">
+                                                    <div className="w-3 h-3 rounded-full border-2 border-foreground-muted"></div>
+                                                    <div className="w-1/2 h-2.5 bg-background-secondary rounded"></div>
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <div className="w-3 h-3 rounded-full border-2 border-primary flex items-center justify-center">
+                                                        <div className="w-1.5 h-1.5 bg-primary rounded-full"></div>
+                                                    </div>
+                                                    <div className="w-2/3 h-2.5 bg-background-secondary rounded"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Add Field Button */}
+                                        <div className="w-full h-10 border-2 border-dashed border-border hover:border-border-hover rounded-xl flex items-center justify-center text-foreground-muted cursor-pointer transition-colors">
+                                            <div className="w-4 h-4 rounded-full bg-background-secondary flex items-center justify-center text-lg leading-none pb-0.5">+</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Floating Integration Badge */}
+                            <div className="absolute -bottom-12 -right-12 bg-card text-foreground p-5 rounded-2xl shadow-[0_20px_40px_rgba(0,0,0,0.1)] z-20 w-[180px] border border-border">
+                                <span className="font-semibold text-[13px] block text-center mb-3">Easy to Build</span>
+                                <div className="flex justify-center items-center h-16 relative">
+                                    {/* Abstract build icons */}
+                                    <div className="w-10 h-10 bg-primary/20 rounded-full absolute left-4 bottom-2 flex items-center justify-center">
+                                        <div className="w-4 h-1 bg-primary rounded-full"></div>
+                                    </div>
+                                    <div className="w-12 h-12 bg-primary rounded-xl absolute right-5 top-1 shadow-lg flex flex-col items-center justify-center gap-1.5">
+                                        <div className="w-5 h-1.5 bg-primary-foreground/80 rounded-full"></div>
+                                        <div className="w-7 h-1.5 bg-primary-foreground/40 rounded-full"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     );
 }

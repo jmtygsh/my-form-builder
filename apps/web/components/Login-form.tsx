@@ -1,60 +1,50 @@
 "use client";
 
-import Link from "next/link";
-import { useForm } from "react-hook-form";
-import { useRouter } from "next/navigation";
-import Image from "next/image";
-
 import { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { Eye, EyeOff, ChevronLeft } from "lucide-react";
 
 import { cn } from "~/lib/utils";
 import { Button } from "./ui/button";
-import { Card, CardContent } from "./ui/card";
 import {
     Field,
-    FieldDescription,
     FieldError,
     FieldGroup,
     FieldLabel,
-    FieldSeparator,
 } from "./ui/field";
 import { Input } from "./ui/input";
 import { useSignIn } from "~/hooks/api/auth";
 
-
-type SignIpFormValues = {
+type SignInFormValues = {
     email: string;
     password: string;
 };
-
 
 export function LoginForm({
     className,
     ...props
 }: React.ComponentPropsWithoutRef<"div">) {
-
-
     const router = useRouter();
-
     const { signInUserWithEmailAndPasswordAsync } = useSignIn();
     const [submitError, setSubmitError] = useState<string | null>(null);
+    const [showPassword, setShowPassword] = useState(false);
 
     const {
         register,
         handleSubmit,
-        formState: { errors, isSubmitting, },
-        getValues
-    } = useForm<SignIpFormValues>({
+        formState: { errors, isSubmitting },
+    } = useForm<SignInFormValues>({
         defaultValues: {
             email: "",
             password: "",
         },
-        mode: "onTouched"
+        mode: "onSubmit"
     });
 
-
-    const submitForm = async (data: SignIpFormValues) => {
+    const submitForm = async (data: SignInFormValues) => {
         setSubmitError(null);
         try {
             await signInUserWithEmailAndPasswordAsync({
@@ -62,86 +52,61 @@ export function LoginForm({
                 password: data.password,
             });
 
-            toast.success("login successfully");
+            toast.success("Login successfully");
             router.push("/dashboard");
         } catch (error) {
-            // console.log(error);
-            const message = "Failed to login into your account"
+            const message = "Failed to login into your account";
             setSubmitError(message);
             toast.error(message);
         }
     }
 
-
     function handleGoogleLogin() {
-        console.log("sibmitted google")
+        console.log("submitted google");
     }
 
     return (
-        <div className={cn("flex flex-col gap-6 drop-shadow-yellow-500", className)} {...props}>
-            <Card className="overflow-hidden p-0">
-                <CardContent className="grid p-0 md:grid-cols-2"
-                >
-                    <form className="p-6 md:p-8" onSubmit={handleSubmit(submitForm)}>
-                        <FieldGroup>
-                            <div className="flex flex-col items-center gap-2 text-center">
-                                <h1 className="text-2xl font-bold">Welcome Back</h1>
-                                <p className="text-muted-foreground text-balance">
-                                    Login to your MakeMyForm
-                                </p>
+        <div className={cn("min-h-screen w-full bg-background text-foreground flex", className)} {...props}>
+            <div className="flex-1 flex flex-col relative">
+                {/* Back Button */}
+                <div className="absolute top-6 left-6">
+                    <Button
+                        variant="outline"
+                        size="icon"
+                        className="h-9 w-9 bg-background-secondary border-border text-foreground-muted hover:text-foreground hover:bg-card hover:border-border-hover rounded-lg"
+                        asChild
+                    >
+                        <Link href="/">
+                            <ChevronLeft className="h-5 w-5" />
+                        </Link>
+                    </Button>
+                </div>
+
+                <div className="flex-1 flex flex-col items-center justify-center p-8 relative">
+                    <div className="w-full max-w-[360px]">
+                        <div className="flex items-center justify-center gap-2.5 mb-6 absolute top-10 left-1/2 -translate-x-1/2">
+                            <div className="w-5 h-5 bg-foreground rotate-45 flex items-center justify-center rounded-[3px]">
+                                <div className="w-1.5 h-1.5 bg-background rounded-[1px] -rotate-45" />
                             </div>
-                            <Field>
-                                <FieldLabel htmlFor="email">Email</FieldLabel>
-                                <Input
-                                    id="email"
-                                    type="email"
-                                    placeholder="your email"
-                                    required
-                                    {...register("email", { required: "email is required" })}
-                                    disabled={isSubmitting}
-                                />
-                                <FieldError errors={[errors.email]} />
-                            </Field>
-                            <Field>
-                                <div className="flex items-center">
-                                    <FieldLabel htmlFor="password">Password</FieldLabel>
-                                    <Link
-                                        href="/test-route"
-                                        className="ml-auto text-sm underline-offset-2 hover:underline"
-                                    >
-                                        Forgot your password?
-                                    </Link>
-                                </div>
-                                <Input
-                                    id="password"
-                                    type="password"
-                                    required
-                                    {...register("password", { required: "password is required" })}
-                                    disabled={isSubmitting}
-                                />
-                            </Field>
+                            <span className="font-bold text-xl tracking-tight text-foreground dark:text-white">MakeMyForm</span>
+                        </div>
 
-                            <Field>
-                                <Button type="submit" className="w-full" disabled={isSubmitting}>
-                                    {isSubmitting ? "Signing in..." : "Login"}
-                                </Button>
-                            </Field>
-                            <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
-                                Or continue with
-                            </FieldSeparator>
-                            <Field className="grid grid-cols-2 gap-4">
+                        <h1 className="text-center text-xl font-medium text-foreground mb-8">Welcome back! 👋</h1>
 
+                        <form onSubmit={handleSubmit(submitForm)} className="space-y-6">
+                            <FieldGroup className="space-y-4">
                                 <Button
                                     variant="outline"
                                     type="button"
                                     onClick={handleGoogleLogin}
                                     disabled={isSubmitting}
+                                    className="w-full bg-transparent border-border hover:bg-background-secondary text-foreground h-10 rounded-lg flex items-center justify-center gap-2"
                                 >
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
                                         viewBox="0 0 24 24"
-                                        width="24"
-                                        height="24"
+                                        width="18"
+                                        height="18"
                                     >
                                         <path
                                             fill="#4285F4"
@@ -160,45 +125,219 @@ export function LoginForm({
                                             d="M12 4.84c1.762 0 3.344.606 4.588 1.796l3.438-3.438C17.964 1.094 15.24 0 12 0 7.38 0 3.196 2.49 1.22 6.766l3.816 3.09C6.013 7.03 8.76 4.84 12 4.84z"
                                         />
                                     </svg>
-                                    <span className="sr-only">Login with Google</span>
+                                    <span className="text-[13px] font-medium">Sign in with Google</span>
                                 </Button>
 
-                                <Button variant="outline" type="button">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                                        <path
-                                            d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"
-                                            fill="currentColor"
+                                <div className="relative flex items-center py-2">
+                                    <div className="flex-grow border-t border-border"></div>
+                                    <span className="flex-shrink-0 mx-4 text-foreground-muted text-[11px] uppercase font-medium">OR</span>
+                                    <div className="flex-grow border-t border-border"></div>
+                                </div>
+
+                                <Field>
+                                    <FieldLabel htmlFor="email" className="text-[13px] text-foreground font-normal">Username or Email</FieldLabel>
+                                    <Input
+                                        id="email"
+                                        type="email"
+                                        placeholder="example@domain.com"
+                                        className="bg-transparent border-border text-[13px] text-foreground placeholder:text-foreground-muted focus-visible:ring-ring focus-visible:border-primary h-10 rounded-lg"
+                                        {...register("email", { required: "Email is required" })}
+                                        disabled={isSubmitting}
+                                    />
+                                    <FieldError errors={[errors.email]} />
+                                </Field>
+
+                                <Field>
+                                    <FieldLabel htmlFor="password" className="text-[13px] text-foreground font-normal">Password</FieldLabel>
+                                    <div className="relative">
+                                        <Input
+                                            id="password"
+                                            type={showPassword ? "text" : "password"}
+                                            placeholder="Please enter your password"
+                                            className="bg-transparent border-border text-[13px] text-foreground placeholder:text-foreground-muted focus-visible:ring-ring focus-visible:border-primary h-10 rounded-lg"
+                                            {...register("password", { required: "Password is required" })}
+                                            disabled={isSubmitting}
                                         />
-                                    </svg>
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowPassword(!showPassword)}
+                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground-muted hover:text-foreground transition-colors"
+                                        >
+                                            {showPassword ? (
+                                                <Eye className="h-4 w-4" />
+                                            ) : (
+                                                <EyeOff className="h-4 w-4" />
+                                            )}
+                                        </button>
+                                    </div>
+                                    <FieldError errors={[errors.password]} />
+                                    <div className="flex justify-end mt-1.5">
+                                        <Link
+                                            href="/test-route"
+                                            className="text-[12px] text-foreground-muted hover:text-foreground underline underline-offset-2 transition-colors"
+                                        >
+                                            Forgot your password?
+                                        </Link>
+                                    </div>
+                                </Field>
+
+                                <FieldError>{submitError}</FieldError>
+
+                                <Button
+                                    type="submit"
+                                    className="w-full bg-button hover:bg-button-hover text-button-foreground h-10 text-sm font-medium rounded-lg mt-2 transition-colors border-0"
+                                    disabled={isSubmitting}
+                                >
+                                    {isSubmitting ? "Logging in..." : "Login"}
                                 </Button>
+                            </FieldGroup>
+                        </form>
 
-
-                            </Field>
-                            <FieldDescription className="text-center">
-                                Don&apos;t have an account?{" "}
-                                <Link href="/test-sign-in">Sign up</Link>
-                            </FieldDescription>
-                        </FieldGroup>
-                    </form>
-
-                    <div className="bg-muted relative hidden md:block mask-l-from-80% mask-l-to-110%">
-                        <Image
-                            src="/assets/log-in.jpg"
-                            alt="Login Image"
-                            fill
-                            className="object-cover"
-                            priority
-                        />
+                        <div className="mt-8 text-center text-sm text-foreground-muted">
+                            You're new here?{" "}
+                            <Link href="/test-sign-in" className="text-primary hover:text-primary-hover font-medium">
+                                Sign up for free
+                            </Link>
+                        </div>
                     </div>
-                </CardContent>
-            </Card>
+                </div>
+            </div>
 
+            {/* Right Pane Promo Mock UI */}
+            <div className="hidden lg:block w-[48%] max-w-3xl p-4 pl-0">
+                <div className="w-full h-full bg-background-secondary rounded-xl p-12 flex flex-col relative overflow-hidden">
+                    <div className="max-w-xl mx-auto w-full pt-12 relative z-10">
+                        <h2 className="text-[34px] font-medium leading-tight mb-4 text-heading">
+                            Match your brandstyle &<br />
+                            <span className="text-primary dark:text-blue-500">Impress your audience</span>
+                        </h2>
+                        <p className="text-foreground text-[14px] leading-relaxed mb-12">
+                            Leave a lasting impression by choosing from 50+ themes or making customizations to showcase your flair and creativity.
+                        </p>
 
-            <FieldDescription className="px-6 text-center">
-                By clicking continue, you agree to our{" "}
-                <Link href="/test-terms">Terms of Service</Link> and{" "}
-                <Link href="/test-terms">Privacy Policy</Link>.
-            </FieldDescription>
+                        {/* Form Builder Themes Mock UI */}
+                        <div className="relative w-full aspect-4/3 mt-8">
+                            <div className="absolute inset-0 bg-background rounded-2xl shadow-2xl overflow-hidden border border-border">
+                                {/* Form Builder Header */}
+                                <div className="h-14 border-b border-border flex items-center justify-between px-6 bg-card">
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-5 h-5 bg-foreground rotate-45 flex items-center justify-center rounded-[3px]">
+                                            <div className="w-1.5 h-1.5 bg-background rounded-[1px] -rotate-45" />
+                                        </div>
+                                    </div>
+                                    <div className="flex gap-10 text-[11px] font-medium text-foreground-muted">
+                                        <div className="flex flex-col items-center gap-1.5 cursor-pointer">
+                                            <div className="w-3.5 h-3.5 bg-foreground-muted/20 rounded-[3px]"></div>
+                                            Build
+                                        </div>
+                                        <div className="flex flex-col items-center gap-1.5 text-primary relative cursor-pointer">
+                                            <div className="w-3.5 h-3.5 bg-primary/10 rounded-[3px]"></div>
+                                            Settings
+                                        </div>
+                                        <div className="flex flex-col items-center gap-1.5 cursor-pointer">
+                                            <div className="w-3.5 h-3.5 bg-foreground-muted/20 rounded-[3px]"></div>
+                                            Connect
+                                        </div>
+                                        <div className="flex flex-col items-center gap-1.5 cursor-pointer">
+                                            <div className="w-3.5 h-3.5 bg-foreground-muted/20 rounded-[3px]"></div>
+                                            Share
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-2 opacity-0">
+                                        <div className="w-6 h-6 rounded-full bg-background-secondary"></div>
+                                    </div>
+                                </div>
+
+                                {/* Form Builder Content */}
+                                <div className="flex h-full p-5 gap-5 bg-background">
+                                    {/* Sidebar mock (Themes) */}
+                                    <div className="w-[160px] flex flex-col gap-4 bg-card p-4 rounded-xl border border-border shadow-sm h-fit">
+                                        <div className="text-[10px] font-semibold text-foreground-muted mb-1">Basic themes</div>
+                                        <div className="grid grid-cols-2 gap-2">
+                                            <div className="w-full aspect-video bg-background border border-border rounded-md shadow-sm"></div>
+                                            <div className="w-full aspect-video bg-primary/20 border border-primary/30 rounded-md shadow-sm"></div>
+                                            <div className="w-full aspect-video bg-pink-500/20 border border-pink-500/30 rounded-md shadow-sm"></div>
+                                            <div className="w-full aspect-video bg-blue-500/20 border border-blue-500/30 rounded-md shadow-sm"></div>
+                                            <div className="w-full aspect-video bg-foreground border border-border rounded-md shadow-sm"></div>
+                                            <div className="w-full aspect-video bg-black border border-border rounded-md shadow-sm"></div>
+                                        </div>
+
+                                        <div className="text-[10px] font-semibold text-foreground-muted mt-2 mb-1">Special crafts</div>
+                                        <div className="grid grid-cols-2 gap-2">
+                                            <div className="w-full aspect-video bg-gradient-to-br from-pink-500/20 to-orange-500/20 border border-border rounded-md shadow-sm"></div>
+                                            <div className="w-full aspect-video bg-gradient-to-br from-blue-500/20 to-purple-500/20 border border-border rounded-md shadow-sm"></div>
+                                        </div>
+                                    </div>
+
+                                    {/* Form Canvas mock */}
+                                    <div className="flex-1 flex flex-col gap-4 mx-auto relative">
+                                        <div className="absolute top-0 right-0 bg-card border border-border rounded-full px-3 py-1.5 flex items-center gap-2 shadow-sm z-10">
+                                            <span className="text-[10px] font-medium text-foreground-muted">Custom CSS</span>
+                                            <div className="w-6 h-3.5 bg-foreground rounded-full relative">
+                                                <div className="w-2.5 h-2.5 bg-background rounded-full absolute right-0.5 top-0.5"></div>
+                                            </div>
+                                        </div>
+
+                                        <div className="bg-card p-6 rounded-xl border border-border shadow-sm mt-8 relative">
+                                            <div className="flex gap-3 mb-6">
+                                                <div className="text-foreground font-medium text-sm">1.</div>
+                                                <div className="flex-1">
+                                                    <div className="w-1/3 h-4 bg-background-secondary rounded mb-3"></div>
+                                                    <div className="w-full h-10 bg-background rounded border border-border"></div>
+                                                </div>
+                                            </div>
+                                            <div className="flex gap-3">
+                                                <div className="text-foreground font-medium text-sm">2.</div>
+                                                <div className="flex-1">
+                                                    <div className="w-1/4 h-4 bg-background-secondary rounded mb-3"></div>
+                                                    <div className="w-full h-10 bg-background rounded border border-border flex items-center px-3">
+                                                        <div className="w-4 h-4 bg-background-secondary rounded-sm mr-2"></div>
+                                                        <div className="w-24 h-3 bg-background-secondary rounded"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Floating Customization Badges */}
+                            <div className="absolute -bottom-6 right-12 flex gap-4 z-20">
+                                <div className="bg-card text-foreground p-4 rounded-2xl shadow-[0_20px_40px_rgba(0,0,0,0.15)] border border-border w-[140px] border-t-pink-500 border-t-4">
+                                    <div className="flex items-center justify-between mb-3">
+                                        <span className="font-medium text-[12px]">Color</span>
+                                        <div className="flex gap-1">
+                                            <div className="w-3 h-3 rounded-full bg-pink-500"></div>
+                                            <div className="w-3 h-3 rounded-full bg-primary"></div>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center justify-between mb-3 pt-3 border-t border-border">
+                                        <span className="font-medium text-[12px]">Font</span>
+                                        <span className="font-serif text-sm">Tt</span>
+                                    </div>
+                                    <div className="flex justify-between pt-3 border-t border-border">
+                                        <div className="w-5 h-5 rounded border border-border flex items-center justify-center"><div className="w-2 h-2 rounded-full border border-foreground-muted"></div></div>
+                                        <div className="w-5 h-5 rounded border border-border flex items-center justify-center"><div className="w-3 h-3 rounded-sm border border-foreground-muted"></div></div>
+                                        <div className="w-5 h-5 rounded border border-border flex items-center justify-center"><div className="w-3 h-2 rounded-sm border border-foreground-muted"></div></div>
+                                    </div>
+                                </div>
+
+                                <div className="bg-card text-foreground p-4 rounded-2xl shadow-[0_20px_40px_rgba(0,0,0,0.15)] border border-border w-[140px] flex flex-col justify-end">
+                                    <div className="bg-primary/10 border border-primary/20 text-primary text-[10px] font-medium py-1.5 px-3 rounded-lg text-center mb-3">
+                                        Upload your logo
+                                    </div>
+                                    <div className="h-16 bg-primary rounded-xl flex items-center justify-center relative overflow-hidden">
+                                        <div className="w-8 h-8 rounded-full border-2 border-primary-foreground/30 flex items-center justify-center">
+                                            <div className="w-3 h-3 bg-primary-foreground rounded-sm rotate-45"></div>
+                                        </div>
+                                        <div className="absolute top-0 right-0 w-8 h-8 bg-white/10 rounded-bl-full"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     );
 }

@@ -79,13 +79,6 @@ function StepItem({
 }
 
 export default function Page() {
-    const [email] = useState<string | null>(() => {
-        // Initialize email from sessionStorage on client side
-        if (typeof window !== "undefined") {
-            return sessionStorage.getItem("signup_email");
-        }
-        return null;
-    });
 
     return (
         <div className="relative flex min-h-svh w-full items-center justify-center p-6 md:p-10">
@@ -116,16 +109,6 @@ export default function Page() {
                                         account
                                     </p>
                                 </div>
-
-                                {email && (
-                                    <Field>
-                                        <FieldLabel>Email sent to:</FieldLabel>
-                                        <div className="flex items-center gap-2 rounded-lg border bg-muted/50 px-3 py-2">
-                                            <MailIcon className="h-4 w-4 text-muted-foreground" />
-                                            <span className="text-sm font-medium">{email}</span>
-                                        </div>
-                                    </Field>
-                                )}
 
                                 <Card className="w-full">
                                     <CardHeader className="pb-1 pt-4 px-4">
