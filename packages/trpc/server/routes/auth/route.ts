@@ -1,6 +1,5 @@
-import { z, zodUndefinedModel } from "../../schema";
 import { userService } from "../../services";
-import { createUserWithEmailAndPasswordInputModel, createUserWithEmailAndPasswordOutputModel, getLoggerInUserInfoInputModel, getLoggerInUserInfoOutput, signInUserWithEmailAndPasswordInputModel, signInUserWithEmailAndPasswordOutputModel } from "./model";
+import { createUserWithEmailAndPasswordInputModel, createUserWithEmailAndPasswordOutputModel, forgetPasswordInputModel, forgetPasswordOutputModel, getLoggerInUserInfoInputModel, getLoggerInUserInfoOutput, signInUserWithEmailAndPasswordInputModel, signInUserWithEmailAndPasswordOutputModel, verifyUserEmailWithTokenInputModel, verifyUserEmailWithTokenOutputModel, resetPasswordInputModel, resetPasswordOutputModel } from "./model";
 
 import { publicProcedure, router } from "../../trpc";
 import { generatePath } from "../../utils/path-generator";
@@ -66,9 +65,44 @@ export const authRouter = router({
         fullName,
         profileImageUrl
       }
-    })
+    }),
 
 
+  verifyUserEmailWithToken: publicProcedure
+    .meta({ openapi: { method: "POST", path: getPath("/verifyUserEmailWithToken"), tags: TAGS } })
+    .input(verifyUserEmailWithTokenInputModel)
+    .output(verifyUserEmailWithTokenOutputModel)
+    .mutation(async ({ input }) => {
+      const { id } = await userService.verifyUserEmailWithToken({ token: input.token });
+      return {
+        id
+      };
+    }),
 
+
+  forgetPassword: publicProcedure
+    .meta({ openapi: { method: "POST", path: getPath("/forgetPassword"), tags: TAGS } })
+    .input(forgetPasswordInputModel)
+    .output(forgetPasswordOutputModel)
+    .mutation(async ({ input }) => {
+      const { message } = await userService.forgetPassword({ email: input.email });
+      return {
+        message
+      };
+    }),
+
+  resetPassword: publicProcedure
+    .meta({ openapi: { method: "POST", path: getPath("/resetPassword"), tags: TAGS } })
+    .input(resetPasswordInputModel)
+    .output(resetPasswordOutputModel)
+    .mutation(async ({ input }) => {
+      const { id } = await userService.setNewPasswordForEmailUser({
+        token: input.token,
+        password: input.password
+      });
+      return {
+        id
+      };
+    }),
 
 });

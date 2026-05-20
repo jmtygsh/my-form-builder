@@ -30,3 +30,29 @@ export const getLoggerInUserInfoOutput = z.object({
     fullName: z.string().describe("Full name of the user"),
     profileImageUrl: z.string().describe("image of the user").optional().nullable()
 })
+
+
+
+export const verifyUserEmailWithTokenInputModel = z.object({
+    token: z.string().describe("Token to verify user email"),
+})
+
+export const verifyUserEmailWithTokenOutputModel = z.object({
+    id: z.string().describe("ID of the user"),
+})
+
+
+export const forgetPasswordInputModel = z.object({
+    email: z.email().describe("Email of the user"),
+})
+export const forgetPasswordOutputModel = z.object({
+    message: z.string().describe("Message to show to the user"),
+})
+
+export const resetPasswordInputModel = z.object({
+    token: z.string().describe("Reset password token"),
+    password: z.string().min(6).describe("New password for the user"),
+})
+export const resetPasswordOutputModel = z.object({
+    id: z.string().describe("ID of the user"),
+})

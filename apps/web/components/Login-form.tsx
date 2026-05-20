@@ -1,43 +1,77 @@
 "use client";
 
 import Link from "next/link";
+import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
 import { useState } from "react";
 import { toast } from "sonner";
 
-import { cn } from "../lib/utils";
+import { cn } from "~/lib/utils";
 import { Button } from "./ui/button";
 import { Card, CardContent } from "./ui/card";
 import {
     Field,
     FieldDescription,
+    FieldError,
     FieldGroup,
     FieldLabel,
     FieldSeparator,
 } from "./ui/field";
 import { Input } from "./ui/input";
+import { useSignIn } from "~/hooks/api/auth";
+
+
+type SignIpFormValues = {
+    email: string;
+    password: string;
+};
+
 
 export function LoginForm({
     className,
     ...props
 }: React.ComponentPropsWithoutRef<"div">) {
 
-    // const [data, setData] = useState({
-    //     email,
-    //     password
-    // })
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
 
     const router = useRouter();
 
-    function submit() {
-        console.log("sibmitted")
+    const { signInUserWithEmailAndPasswordAsync } = useSignIn();
+    const [submitError, setSubmitError] = useState<string | null>(null);
+
+    const {
+        register,
+        handleSubmit,
+        formState: { errors, isSubmitting, },
+        getValues
+    } = useForm<SignIpFormValues>({
+        defaultValues: {
+            email: "",
+            password: "",
+        },
+        mode: "onTouched"
+    });
+
+
+    const submitForm = async (data: SignIpFormValues) => {
+        setSubmitError(null);
+        try {
+            await signInUserWithEmailAndPasswordAsync({
+                email: data.email,
+                password: data.password,
+            });
+
+            toast.success("login successfully");
+            router.push("/dashboard");
+        } catch (error) {
+            // console.log(error);
+            const message = "Failed to login into your account"
+            setSubmitError(message);
+            toast.error(message);
+        }
     }
+
 
     function handleGoogleLogin() {
         console.log("sibmitted google")
@@ -48,7 +82,7 @@ export function LoginForm({
             <Card className="overflow-hidden p-0">
                 <CardContent className="grid p-0 md:grid-cols-2"
                 >
-                    <form className="p-6 md:p-8 " onSubmit={submit}>
+                    <form className="p-6 md:p-8" onSubmit={handleSubmit(submitForm)}>
                         <FieldGroup>
                             <div className="flex flex-col items-center gap-2 text-center">
                                 <h1 className="text-2xl font-bold">Welcome Back</h1>
@@ -61,12 +95,12 @@ export function LoginForm({
                                 <Input
                                     id="email"
                                     type="email"
-                                    placeholder="makemyform@ec.com"
+                                    placeholder="your email"
                                     required
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    disabled={isLoading}
+                                    {...register("email", { required: "email is required" })}
+                                    disabled={isSubmitting}
                                 />
+                                <FieldError errors={[errors.email]} />
                             </Field>
                             <Field>
                                 <div className="flex items-center">
@@ -82,19 +116,14 @@ export function LoginForm({
                                     id="password"
                                     type="password"
                                     required
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    disabled={isLoading}
+                                    {...register("password", { required: "password is required" })}
+                                    disabled={isSubmitting}
                                 />
                             </Field>
-                            {error && (
-                                <p className="text-destructive text-sm" role="alert">
-                                    {error}
-                                </p>
-                            )}
+
                             <Field>
-                                <Button type="submit" className="w-full" disabled={isLoading}>
-                                    {isLoading ? "Signing in..." : "Login"}
+                                <Button type="submit" className="w-full" disabled={isSubmitting}>
+                                    {isSubmitting ? "Signing in..." : "Login"}
                                 </Button>
                             </Field>
                             <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
@@ -106,7 +135,7 @@ export function LoginForm({
                                     variant="outline"
                                     type="button"
                                     onClick={handleGoogleLogin}
-                                    disabled={isLoading}
+                                    disabled={isSubmitting}
                                 >
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
@@ -141,7 +170,6 @@ export function LoginForm({
                                             fill="currentColor"
                                         />
                                     </svg>
-
                                 </Button>
 
 

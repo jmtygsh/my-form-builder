@@ -55,3 +55,5 @@ export function getAuthenticationCookie(ctx: TRPCConext) {
 export function clearAuthenticationCookie(ctx: TRPCConext) {
     ctx.clearCookie(AUTHENTICATION_COOKIE_NAME);
 }
+
+

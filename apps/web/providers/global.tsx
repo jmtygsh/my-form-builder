@@ -26,7 +26,12 @@ export const GlobalProviders: React.FC<{ children: React.ReactNode }> = ({ child
     <QueryClientProvider client={queryClient}>
       <trpc.Provider queryClient={queryClient} client={trpcClient}>
         {children}
-        <Toaster />
+        <Toaster
+          closeButton
+          position="top-center"
+          richColors
+          toastOptions={{ duration: 5000 }}
+        />
       </trpc.Provider>
     </QueryClientProvider>
   );
