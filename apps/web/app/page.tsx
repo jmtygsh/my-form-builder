@@ -73,7 +73,7 @@ export default function Home() {
               asChild
               className="bg-button hover:bg-button-hover text-button-foreground h-9 px-4 text-sm font-medium rounded-lg transition-colors border-0"
             >
-              <Link href="/sign-up">
+              <Link href="/dashboard">
                 Get started
               </Link>
             </Button>

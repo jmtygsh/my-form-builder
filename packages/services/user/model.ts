@@ -41,3 +41,21 @@ export const resetPasswordInput = z.object({
   password: z.string().describe("new password")
 })
 export type resetPasswordInputType = z.infer<typeof resetPasswordInput>;
+
+
+
+// forms 
+export const createFormDisplayInput = z.object({
+  userId: z.string().describe("uuid of the user"),
+  title: z.string().describe("title of the form"),
+  description: z.string().optional().describe("description of the form"),
+})
+export type createFormDisplayInputType = z.infer<typeof createFormDisplayInput>;
+
+
+
+export const getFormDisplayListInput = z.object({
+  userId: z.string().describe("uuid of the user"),
+})
+export type getFormDisplayListInputType = z.infer<typeof getFormDisplayListInput>;
+

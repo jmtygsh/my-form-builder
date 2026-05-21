@@ -14,8 +14,13 @@ import {
   signInUserWithEmailAndPasswordInput,
   signInUserWithEmailAndPasswordInputType,
   verifyUserEmailWithTokenInput,
-  verifyUserEmailWithTokenInputType
+  verifyUserEmailWithTokenInputType,
+  createFormDisplayInputType,
+  createFormDisplayInput,
+  getFormDisplayListInputType,
+  getFormDisplayListInput
 } from "./model";
+import { displayFormsTable } from "@repo/database/models/form";
 
 import EmailService from "../email";
 import { env } from "../env";
@@ -233,6 +238,50 @@ class UserService {
     await db.delete(passwordResetTokensTable).where(eq(passwordResetTokensTable.userId, tokenInfo.userId));
 
     return { id: userInfo.id };
+  }
+
+
+  // Form services
+  public async createFormDisplay(payload: createFormDisplayInputType) {
+    const { userId, title, description } = await createFormDisplayInput.parseAsync(payload);
+
+    // check if user is exist or not
+    const user = await this.getUserById(userId);
+    if (!user) throw new Error(`User does not exist`);
+
+    const baseSlug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '') || 'form';
+    const uniqueSuffix = randomBytes(4).toString("hex");
+    const slug = `${baseSlug}-${uniqueSuffix}`;
+
+    // insert form to database
+    const form = await db.insert(displayFormsTable).values({
+      userId,
+      title,
+      description,
+      slug,
+    }).returning({ id: displayFormsTable.id })
+
+    const newForm = form[0];
+    if (!newForm) throw new Error(`Form does not exist`);
+
+    return { id: newForm.id, slug };
+
+  }
+
+
+  public async getFormDisplayList(payload: getFormDisplayListInputType) {
+    const { userId } = await getFormDisplayListInput.parseAsync(payload);
+
+    // check if user is exist or not
+    const user = await this.getUserById(userId);
+    if (!user) throw new Error(`User does not exist`);
+
+    // fetch forms for the user
+    const forms = await db.select().from(displayFormsTable).where(eq(displayFormsTable.userId, userId));
+
+    if (!forms) throw new Error(`User does not have any form`);
+
+    return forms;
   }
 
 }

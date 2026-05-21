@@ -69,7 +69,7 @@ export function LoginForm({
         <div className={cn("min-h-screen w-full bg-background text-foreground flex", className)} {...props}>
             <div className="flex-1 flex flex-col relative">
                 {/* Back Button */}
-                <div className="absolute top-6 left-6">
+                <div className="absolute top-6 left-6 z-50">
                     <Button
                         variant="outline"
                         size="icon"

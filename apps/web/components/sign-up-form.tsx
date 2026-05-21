@@ -81,7 +81,7 @@ export function SignUpForm({
     return (
         <div className={cn("min-h-screen w-full bg-background text-foreground flex", className)} {...props}>
 
-            <div className="flex-1 flex flex-col relative">
+            <div className="flex-1 flex flex-col relative z-50">
                 {/* Back Button */}
                 <div className="absolute top-6 left-6">
                     <Button
