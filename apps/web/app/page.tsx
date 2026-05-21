@@ -5,25 +5,21 @@ import Link from "next/link";
 import { useUser } from "~/hooks/api/auth";
 import { redirect, RedirectType } from 'next/navigation'
 import { Sun, Moon } from "lucide-react";
+import { useTheme } from "next-themes";
 import { Button } from "~/components/ui/button";
 
 export default function Home() {
   const { user } = useUser()
-  const [isDark, setIsDark] = useState(false);
+  const { theme, setTheme, resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
 
+  // Initialize mounted state to avoid hydration mismatch
   useEffect(() => {
-    // Check initial theme preference
-    if (typeof document !== 'undefined') {
-      const isDarkMode = document.documentElement.classList.contains('dark');
-      setIsDark(isDarkMode);
-    }
+    setMounted(true);
   }, []);
 
   const toggleTheme = () => {
-    if (typeof document !== 'undefined') {
-      document.documentElement.classList.toggle('dark');
-      setIsDark(!isDark);
-    }
+    setTheme(resolvedTheme === "dark" ? "light" : "dark");
   };
 
   useEffect(() => {
@@ -59,9 +55,10 @@ export default function Home() {
               variant="outline"
               size="icon"
               onClick={toggleTheme}
-              className="h-9 w-9 bg-background-secondary border-border text-foreground-muted hover:text-foreground hover:bg-card hover:border-border-hover rounded-lg"
+              className="cursor-pointer h-8 w-8 bg-background-secondary/10  text-foreground-muted hover:text-foreground hover:bg-card  rounded-lg"
             >
-              {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+              <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+              <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
               <span className="sr-only">Toggle theme</span>
             </Button>
 

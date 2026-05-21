@@ -195,7 +195,7 @@ export function LoginForm({
 
                         <div className="mt-8 text-center text-sm text-foreground-muted">
                             You're new here?{" "}
-                            <Link href="/test-sign-in" className="text-primary hover:text-primary-hover font-medium">
+                            <Link href="/registration" className="text-primary hover:text-primary-hover font-medium">
                                 Sign up for free
                             </Link>
                         </div>
