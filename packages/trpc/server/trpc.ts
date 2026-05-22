@@ -8,7 +8,34 @@ import { userService } from "./services";
 export const tRPCContext = initTRPC
   .meta<OpenApiMeta>()
   .context<typeof createContext>()
-  .create({});
+  .create({
+    errorFormatter({ shape, error }) {
+
+      if (error.code !== 'INTERNAL_SERVER_ERROR') {
+        return shape;
+      }
+
+      const isStandardError = error.cause instanceof Error && error.cause.name === 'Error';
+
+      const safeMessage = isStandardError
+        ? error.message
+        : "An unexpected internal server error occurred.";
+
+      if (!isStandardError) {
+        console.error("🔥 UNHANDLED SYSTEM ERROR:", error);
+      }
+
+      return {
+        ...shape,
+        message: safeMessage,
+        data: {
+          ...shape.data,
+          // Remove the stack trace from the frontend in production
+          stack: process.env.NODE_ENV === 'development' ? shape.data.stack : undefined,
+        },
+      };
+    },
+  });
 
 export const router = tRPCContext.router;
 

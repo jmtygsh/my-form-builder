@@ -1,6 +1,7 @@
 import { randomBytes, createHmac } from "node:crypto";
 import * as JWT from "jsonwebtoken";
 import { db, eq } from "@repo/database";
+
 import { passwordResetTokensTable, usersTable } from "@repo/database/models/user";
 import {
   type createUserWithEmailAndPasswordInputType,
