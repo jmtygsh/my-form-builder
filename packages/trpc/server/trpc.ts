@@ -30,8 +30,8 @@ export const tRPCContext = initTRPC
         message: safeMessage,
         data: {
           ...shape.data,
-          // Remove the stack trace from the frontend in production
-          stack: process.env.NODE_ENV === 'development' ? shape.data.stack : undefined,
+          // Remove the stack trace from the frontend entirely
+          stack: undefined,
         },
       };
     },

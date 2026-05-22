@@ -61,7 +61,7 @@ export function CreateFormDisplay({
 
             toast.success("Form created successfully!");
             // Redirect to the form builder page using the new form's id
-            router.push(`/forms/${id}`);
+            router.push(`/dashboard/form/${id}`);
         } catch (error: any) {
             const message = error.message || "Failed to create your form";
             setSubmitError(message);

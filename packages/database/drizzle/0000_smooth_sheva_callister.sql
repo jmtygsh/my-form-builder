@@ -27,8 +27,10 @@ CREATE TABLE "display_forms" (
 	"user_id" uuid NOT NULL,
 	"title" varchar(255) NOT NULL,
 	"description" text,
+	"slug" varchar(255) NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
-	"updated_at" timestamp
+	"updated_at" timestamp,
+	CONSTRAINT "display_forms_slug_unique" UNIQUE("slug")
 );
 --> statement-breakpoint
 CREATE TABLE "form_payload" (
@@ -41,11 +43,9 @@ CREATE TABLE "form_payload" (
 	"placeholder" text,
 	"required" boolean DEFAULT false NOT NULL,
 	"ordered" real NOT NULL,
-	"slug" varchar(255) NOT NULL,
 	"properties" jsonb DEFAULT '{}'::jsonb,
 	"created_at" timestamp DEFAULT now() NOT NULL,
-	"updated_at" timestamp,
-	CONSTRAINT "form_payload_slug_unique" UNIQUE("slug")
+	"updated_at" timestamp
 );
 --> statement-breakpoint
 CREATE TABLE "form_responses" (
@@ -62,8 +62,8 @@ CREATE TABLE "form_table_configuration" (
 	"theme_name" varchar(100),
 	"visibility" "visibility" DEFAULT 'unpublished' NOT NULL,
 	"properties" jsonb DEFAULT '{}'::jsonb,
-	"protected" boolean DEFAULT false NOT NULL,
-	"password" varchar(255) DEFAULT '' NOT NULL,
+	"protected" boolean DEFAULT false,
+	"password" varchar(255) DEFAULT '',
 	"expiry" timestamp,
 	"allow_anonymous" boolean DEFAULT false NOT NULL,
 	"max_responses" integer,

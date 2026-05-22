@@ -108,13 +108,6 @@ export type Step = {
     elements: BuilderElement[];
 };
 
-export type PreviewState = {
-    stepIndex: number;
-    values: Record<string, unknown>;
-    errors: Record<string, string>;
-    status: "editing" | "success" | "error";
-};
-
 export type ElementTemplate =
     | { kind: "field"; type: BuilderFieldType }
     | { kind: "section" }

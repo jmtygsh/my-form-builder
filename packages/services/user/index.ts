@@ -273,12 +273,21 @@ class UserService {
   public async getFormDisplayList(payload: getFormDisplayListInputType) {
     const { userId } = await getFormDisplayListInput.parseAsync(payload);
 
+    console.log('getFormDisplayList', userId)
+
+
     // check if user is exist or not
     const user = await this.getUserById(userId);
     if (!user) throw new Error(`User does not exist`);
 
     // fetch forms for the user
+
+
+    console.log('entered form db:query')
     const forms = await db.select().from(displayFormsTable).where(eq(displayFormsTable.userId, userId));
+
+
+    console.log('getFormDisplayList forms', forms.map((form) => form.id))
 
     if (!forms) throw new Error(`User does not have any form`);
 

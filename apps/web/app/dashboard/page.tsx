@@ -12,7 +12,10 @@ import {
 import { useGetFormDisplayList } from "~/hooks/api/form"
 
 function MyForms({ onNavigate }: { onNavigate: (tab: TabType) => void }) {
+
     const { formDisplayList: forms, isLoading } = useGetFormDisplayList();
+
+    console.log('MyForms', forms)
 
     return (
         <div className="flex flex-1 flex-col bg-muted/30 rounded-tl-xl overflow-hidden shadow-inner border-l border-t border-border/50">

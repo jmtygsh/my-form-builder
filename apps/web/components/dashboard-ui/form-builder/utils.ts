@@ -11,6 +11,7 @@ import {
     Type,
     Upload,
 } from "lucide-react";
+import { arrayMove } from "@dnd-kit/sortable";
 import type {
     BuilderAction,
     BuilderElement,
@@ -19,13 +20,24 @@ import type {
     ElementTemplate,
     FieldElement,
     FieldValidation,
-    NumberValidation,
-    PreviewState,
-    RatingValidation,
     Step,
-    TextValidation,
-    FileValidation,
 } from "./types";
+
+/**
+ * ============================================================================
+ * FORM BUILDER UTILITIES (THE TOOLBOX)
+ * ============================================================================
+ * 
+ * This file contains all the behind-the-scenes helpers and definitions that
+ * make the form builder run smoothly without cluttering up the visual components.
+ * 
+ * Key Responsibilities:
+ * - Defines the Master List of Field Types (FIELD_TEMPLATES).
+ * - Generates unique IDs for new fields.
+ * - Provides the default settings when a user creates a new field.
+ * - Handles the complex logic of splitting fields into separate "pages" (steps).
+ * ============================================================================
+ */
 
 export const FIELD_TEMPLATES: Array<{
     template: ElementTemplate;
@@ -207,16 +219,6 @@ export function validateFieldValue(field: FieldElement, value: unknown): string 
     return null;
 }
 
-export function computeErrorsForElements(elements: BuilderElement[], values: PreviewState["values"]) {
-    const errors: Record<string, string> = {};
-    for (const el of elements) {
-        if (el.kind !== "field") continue;
-        const err = validateFieldValue(el, values[el.id]);
-        if (err) errors[el.id] = err;
-    }
-    return errors;
-}
-
 export function safeLabelForElement(el: BuilderElement): string {
     if (el.kind === "field") return el.label.trim() || "Untitled field";
     if (el.kind === "section") return el.title.trim() || "Section";
@@ -298,11 +300,11 @@ export function builderReducer(state: BuilderState, action: BuilderAction): Buil
         const nextElements = [...state.elements.slice(0, index + 1), cloned, ...state.elements.slice(index + 1)];
         return { ...state, elements: nextElements, selectedId: cloned.id };
     }
-    // if (action.type === "element.move") {
-    //     const activeIndex = state.elements.findIndex((e) => e.id === action.activeId);
-    //     const overIndex = state.elements.findIndex((e) => e.id === action.overId);
-    //     if (activeIndex < 0 || overIndex < 0 || activeIndex === overIndex) return state;
-    //     return { ...state, elements: state.elements, activeIndex, overIndex };
-    // }
+    if (action.type === "element.move") {
+        const activeIndex = state.elements.findIndex((e) => e.id === action.activeId);
+        const overIndex = state.elements.findIndex((e) => e.id === action.overId);
+        if (activeIndex < 0 || overIndex < 0 || activeIndex === overIndex) return state;
+        return { ...state, elements: arrayMove(state.elements, activeIndex, overIndex) };
+    }
     return state;
 }
