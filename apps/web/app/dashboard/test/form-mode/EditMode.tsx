@@ -8,41 +8,12 @@ import {
 } from "~/components/ui/resizable"
 
 import { arrayMove } from "@dnd-kit/sortable";
-import { FIELD_DATA } from "./data";
-import Canvas from "./canvas";
+import { FIELD_DATA } from "../form/data";
+import Canvas from "../form/canvas";
 import { cn } from "~/lib/utils";
+import { SidebarItem } from "../form-sidebar/element-sidebar/SidebarItem";
 
-// 1. Draggable Sidebar Item Component
-function SidebarItem({ field }: { field: typeof FIELD_DATA[number] }) {
-    const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
-        id: `sidebar-${field.id}`,
-        data: {
-            type: "sidebar-item",
-            field,
-        },
-    });
 
-    return (
-
-        <div
-            ref={setNodeRef}
-            {...attributes}
-            {...listeners}
-            className={cn(`border-border/60 hover:bg-accent/40 hover:text-accent-foreground bg-background group flex w-full 
-                items-start gap-3 rounded-lg border px-3 py-2 text-left transition-colors cursor-grab active:cursor-grabbing
-                         ${isDragging ? "opacity-50" : ""}`)}>
-            <div className="bg-muted/50 text-foreground flex size-9 shrink-0 items-center justify-center rounded-md border hover:bg-muted/80">
-                {field.icon}
-            </div>
-            <div className="flex-1 min-w-0">
-                <div className="text-sm font-medium leading-none truncate">{field.label}</div>
-                <div className="text-muted-foreground mt-1.5 text-xs leading-snug line-clamp-2">{field.description}</div>
-            </div>
-        </div >
-    );
-}
-
-// 2. Main EditMode Component
 export default function EditMode() {
     // State to hold the items that have been dropped into the canvas
     const [canvasItems, setCanvasItems] = useState<any[]>([]);
@@ -60,7 +31,7 @@ export default function EditMode() {
         }
     }
 
-    // 3. Handle what happens when we drop an item
+    // Handle what happens when we drop an item
     function handleDragEnd(event: DragEndEvent) {
         const { active, over } = event;
 
@@ -102,7 +73,7 @@ export default function EditMode() {
         } else if (isCanvasItem) {
             // Handle re-ordering within the canvas
             const oldIndex = canvasItems.findIndex(item => item.instanceId === active.id);
-            const newIndex = isOverCanvasItem 
+            const newIndex = isOverCanvasItem
                 ? canvasItems.findIndex(item => item.instanceId === over.id)
                 : canvasItems.length - 1;
 

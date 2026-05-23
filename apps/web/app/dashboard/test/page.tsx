@@ -41,8 +41,8 @@ import {
     ResizablePanelGroup,
 } from "~/components/ui/resizable"
 import { FieldPickerDialog } from "~/components/dashboard-ui/form-builder/canvas/FieldPickerDialog";
-import EditMode from "./EditMode";
-import LiveMode from "./LiveMode";
+import EditMode from "./form-mode/EditMode";
+import LiveMode from "./form-mode/LiveMode";
 
 
 export default function FormBuilder({ formId }: { formId: string }) {
@@ -61,11 +61,28 @@ export default function FormBuilder({ formId }: { formId: string }) {
                     <Button variant="ghost" size="icon" onClick={() => router.push("/dashboard")} className="hover:bg-accent">
                         <ChevronLeft className="size-5" />
                     </Button>
-                    <Input
-                        value=""
+                    <div className="hidden lg:flex items-center rounded-md border border-border/60 bg-muted/20 p-0.5">
+                        <Button
+                            type="button"
+                            variant={viewMode === "edit" ? "secondary" : "ghost"}
+                            size="sm"
+                            className="h-7 px-3 text-xs shadow-none"
 
-                        className="bg-transparent px-2 text-base border border-border/60 rounded-md font-semibold hover:border-border focus-visible:ring-1"
-                    />
+                        >
+                            <Pencil className="mr-1.5 size-3.5" />
+                            Layout
+                        </Button>
+                        <Button
+                            type="button"
+                            variant={viewMode === "preview" ? "secondary" : "ghost"}
+                            size="sm"
+                            className="h-7 px-3 text-xs shadow-none"
+
+                        >
+                            <Eye className="mr-1.5 size-3.5" />
+                            Preview
+                        </Button>
+                    </div>
                 </div>
 
                 <div className="flex justify-center w-1/3">
