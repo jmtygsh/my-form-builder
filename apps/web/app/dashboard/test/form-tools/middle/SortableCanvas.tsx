@@ -1,23 +1,23 @@
-// canvas items
 import { useDndContext } from "@dnd-kit/core";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Copy, GripVertical, Trash2 } from "lucide-react";
-import { Button } from "~/components/ui/button";
+import { GripVertical } from "lucide-react";
+import { CanvasNode, getFieldData } from "../../data";
+import { CanvasItemRenderer } from "./canvas-render-options/CanvasItemRenderer";
+import { GridCanvasItem } from "./canvas-render-options/GridCanvasItem";
 
-
-export function SortableCanvas({ item }: { item: any }) {
+export function SortableCanvas({ node }: { node: CanvasNode }) {
     const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
-        id: item.instanceId,
+        id: node.instanceId,
         data: {
             type: "canvas-item",
-            item,
+            node,
         },
     });
 
     const { active, over } = useDndContext();
-    const isOver = over?.id === item.instanceId;
-    const isSidebarItemDragging = active?.data?.current?.type === "sidebar-item";
+    const isOver = over?.id === node.instanceId;
+    const isSidebarItemDragging = active?.data?.current?.type === "sidebar-item" || active?.data?.current?.type === "sidebar-layout";
     const showDropIndicator = isOver && isSidebarItemDragging;
 
     const style = {
@@ -26,61 +26,46 @@ export function SortableCanvas({ item }: { item: any }) {
         opacity: isDragging ? 0.5 : 1,
     };
 
+    const fieldData = getFieldData(node.fieldId);
+
     return (
-        <div
-            ref={setNodeRef}
-            style={style}
-            className="relative"
-        >
+        <div ref={setNodeRef} style={style} className="relative w-full">
             {showDropIndicator && (
                 <div className="absolute -top-3 left-0 right-0 h-1.5 bg-primary rounded-full z-50 shadow-sm" />
             )}
-            <div className="group relative p-5 border rounded-lg bg-card shadow-sm hover:border-primary/50 transition-colors flex gap-3">
-                <div className="absolute top-3 right-3 text-muted-foreground shrink-0 rounded-md border bg-muted/30 px-2 py-1 text-[11px] leading-none">
-                    {item.label}
-                </div>
+
+            <div className="group relative border rounded-xl bg-card shadow-sm hover:border-primary/40 transition-colors flex overflow-hidden">
+
+                {/* Drag Handle Area */}
                 <div
                     {...attributes}
                     {...listeners}
-                    className="cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground mt-2"
+                    className="w-10 shrink-0 bg-muted/30 border-r flex items-center justify-center cursor-grab active:cursor-grabbing hover:bg-muted/50 transition-colors"
                 >
-                    <GripVertical className="size-5" />
+                    <GripVertical className="size-4 text-muted-foreground/50 group-hover:text-muted-foreground transition-colors" />
                 </div>
 
-                <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-3">
-                        <span className="text-primary">{item.icon}</span>
-                        <span className="font-semibold">{item.label}</span>
-                        {item.isRequired && <span className="text-destructive text-sm">*</span>}
+                {/* Top Right Label Badge */}
+                {node.type !== "sidebar-layout" && (
+                    <div className="absolute top-3 right-3 z-10 text-muted-foreground shrink-0 rounded-full border bg-background/80 backdrop-blur-sm px-2.5 py-1 text-[10px] font-medium leading-none opacity-0 group-hover:opacity-100 transition-opacity">
+                        {fieldData?.label}
                     </div>
-                    <div className="mt-4 flex flex-wrap items-center gap-2 focus-within:opacity-100 ">
-                        <Button
-                            type="button"
-                            variant="secondary"
-                            size="xs"
-                            className="h-7 text-xs font-medium cursor-pointer"
-                            onClick={(e) => {
-                                // e.stopPropagation();
-                                // onDuplicate(element.id);
-                            }}
-                        >
-                            <Copy className="mr-1.5 size-3.5" />
-                            Duplicate
-                        </Button>
-                        <Button
-                            type="button"
-                            variant="destructive"
-                            size="xs"
-                            className="h-7 text-xs font-medium bg-destructive/10 text-destructive hover:bg-destructive/20 border-transparent hover:border-destructive/30 border cursor-pointer"
-                            onClick={(e) => {
-                                // e.stopPropagation();
-                                // onDelete(element.id);
-                            }}
-                        >
-                            <Trash2 className="mr-1.5 size-3.5" />
-                            Delete
-                        </Button>
-                    </div>
+                )}
+
+                {/* Content Area */}
+                <div className="flex-1 p-5 min-w-0">
+                    {node.type === "sidebar-layout" ? (
+                        <div className="relative">
+                            {/* Layout specific top right badge */}
+                            <div className="absolute -top-7 right-0 text-muted-foreground shrink-0 rounded-t-lg border border-b-0 bg-muted/30 px-3 py-1 text-[10px] font-medium leading-none flex items-center gap-1.5">
+                                {fieldData?.icon && <span className="size-3">{fieldData.icon}</span>}
+                                {fieldData?.label}
+                            </div>
+                            <GridCanvasItem node={node} />
+                        </div>
+                    ) : (
+                        <CanvasItemRenderer fieldId={node.fieldId} />
+                    )}
                 </div>
             </div>
         </div>

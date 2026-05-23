@@ -23,6 +23,21 @@ import {
     LayoutPanelTop,
 } from "lucide-react";
 
+export type CanvasNode = {
+    instanceId: string;
+    fieldId: string; // references FIELD_DATA.id or LAYOUT_DATA.id
+    type: "sidebar-item" | "sidebar-layout"; // To know if it's an element or a grid
+    children?: Record<string, CanvasNode | null>; // Grid slots map (e.g., "col-0": CanvasNode, "col-1": null). Just ONE element per slot.
+};
+
+export function getFieldData(fieldId: string) {
+    const layout = LAYOUT_DATA.find((l) => l.id === fieldId);
+    if (layout) return layout;
+    const field = FIELD_DATA.find((f) => f.id === fieldId);
+    if (field) return field;
+    return null;
+}
+
 export const LAYOUT_DATA = [
     {
         id: "grid-2",

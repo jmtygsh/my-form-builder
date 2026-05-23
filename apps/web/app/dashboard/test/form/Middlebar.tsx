@@ -5,8 +5,10 @@ import { cn } from "~/lib/utils";
 import { SortableCanvas } from "../form-tools/middle/SortableCanvas";
 
 
+import { CanvasNode } from "../data";
+
 // show the canvas 
-export default function Canvas({ id, items }: { id: string; items: any[] }) {
+export default function Canvas({ id, items }: { id: string; items: CanvasNode[] }) {
     const { setNodeRef } = useDroppable({ id });
     const { active, over } = useDndContext();
 
@@ -22,7 +24,7 @@ export default function Canvas({ id, items }: { id: string; items: any[] }) {
                 isEmpty && "justify-center",
             )}
         >
-            <div className="mx-auto max-w-xl w-full flex flex-col pb-12">
+            <div className="mx-auto  w-full flex flex-col pb-12">
                 {isEmpty ? (
                     <div className="flex flex-col items-center justify-center gap-4 rounded-xl border-2 border-dashed border-border/60 bg-card/50 p-12 text-center transition-colors hover:bg-card/80">
                         <div className="flex size-10 items-center justify-center rounded-full border shadow-sm">
@@ -37,7 +39,7 @@ export default function Canvas({ id, items }: { id: string; items: any[] }) {
                     <SortableContext items={items.map(i => i.instanceId)} strategy={verticalListSortingStrategy}>
                         <div className="flex flex-col gap-4">
                             {items.map((item) => (
-                                <SortableCanvas key={item.instanceId} item={item} />
+                                <SortableCanvas key={item.instanceId} node={item} />
                             ))}
                             {isOverCanvas && isSidebarItemDragging && (
                                 <div className="h-1.5 w-full bg-primary rounded-full mt-2 opacity-80" />
