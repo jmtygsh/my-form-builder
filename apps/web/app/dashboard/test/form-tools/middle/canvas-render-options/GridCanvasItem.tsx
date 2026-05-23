@@ -2,7 +2,15 @@ import { useDroppable, useDndContext } from "@dnd-kit/core";
 import { CanvasNode, getFieldData } from "../../../data";
 import { CanvasItemRenderer } from "./CanvasItemRenderer";
 
-function GridSlot({ node, colKey }: { node: CanvasNode; colKey: string }) {
+function GridSlot({
+    node,
+    colKey,
+    onDelete
+}: {
+    node: CanvasNode;
+    colKey: string;
+    onDelete?: (id: string) => void;
+}) {
     const slotId = `${node.instanceId}-${colKey}`;
     const childNode = node.children?.[colKey];
 
@@ -31,7 +39,12 @@ function GridSlot({ node, colKey }: { node: CanvasNode; colKey: string }) {
         >
             {childNode ? (
                 <div className="bg-background w-full h-full flex flex-col justify-center px-4 relative group">
-                    <CanvasItemRenderer fieldId={childNode.fieldId} inGrid={true} />
+                    <CanvasItemRenderer
+                        fieldId={childNode.fieldId}
+                        instanceId={childNode.instanceId}
+                        inGrid={true}
+                        onDelete={onDelete}
+                    />
                 </div>
             ) : (
                 <div className="flex-1 flex items-center justify-center text-xs font-medium text-muted-foreground/60 select-none">
@@ -42,7 +55,13 @@ function GridSlot({ node, colKey }: { node: CanvasNode; colKey: string }) {
     );
 }
 
-export function GridCanvasItem({ node }: { node: CanvasNode }) {
+export function GridCanvasItem({ 
+    node,
+    onDelete 
+}: { 
+    node: CanvasNode;
+    onDelete?: (id: string) => void;
+}) {
     const layoutData = getFieldData(node.fieldId);
     const columns = layoutData && "columns" in layoutData ? layoutData.columns : 1;
 
@@ -53,7 +72,12 @@ export function GridCanvasItem({ node }: { node: CanvasNode }) {
                 style={{ gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` }}
             >
                 {Array.from({ length: columns }).map((_, i) => (
-                    <GridSlot key={i} node={node} colKey={`col-${i}`} />
+                    <GridSlot
+                        key={i}
+                        node={node}
+                        colKey={`col-${i}`}
+                        onDelete={onDelete}
+                    />
                 ))}
             </div>
         </div>

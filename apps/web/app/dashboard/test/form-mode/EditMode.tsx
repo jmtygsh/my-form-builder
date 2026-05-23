@@ -13,6 +13,7 @@ import { RightSidebar } from "../form/RightSidebar";
 import Canvas from "../form/Middlebar";
 import { cn } from "~/lib/utils";
 import { CanvasNode, getFieldData } from "../data";
+import { deleteCanvasItem, duplicateCanvasItem } from "../utils";
 
 export default function EditMode({ activeTab }: { activeTab: "elements" | "layouts" }) {
     // State to hold the items that have been dropped into the canvas
@@ -20,6 +21,14 @@ export default function EditMode({ activeTab }: { activeTab: "elements" | "layou
 
     // State to hold the currently dragged item for the visual overlay
     const [activeField, setActiveField] = useState<any>(null);
+
+    const handleDelete = (instanceId: string) => {
+        setCanvasItems((prev) => deleteCanvasItem(prev, instanceId));
+    };
+
+    const handleDuplicate = (instanceId: string) => {
+        setCanvasItems((prev) => duplicateCanvasItem(prev, instanceId));
+    };
 
     // Track what is being dragged so we can show it in the overlay
     function handleDragStart(event: DragStartEvent) {
@@ -120,20 +129,25 @@ export default function EditMode({ activeTab }: { activeTab: "elements" | "layou
                     orientation="horizontal"
                     className="rounded-lg"
                 >
-                    <ResizablePanel defaultSize="20%">
+                    <ResizablePanel defaultSize={20}>
                         <LeftSidebar activeTab={activeTab} />
                     </ResizablePanel>
 
                     <ResizableHandle withHandle />
 
 
-                    <ResizablePanel defaultSize="60%">
-                        <Canvas id="canvas-droppable" items={canvasItems} />
+                    <ResizablePanel defaultSize={60}>
+                        <Canvas
+                            id="canvas-droppable"
+                            items={canvasItems}
+                            onDelete={handleDelete}
+                            onDuplicate={handleDuplicate}
+                        />
                     </ResizablePanel>
 
                     <ResizableHandle withHandle />
 
-                    <ResizablePanel defaultSize="20%">
+                    <ResizablePanel defaultSize={20}>
                         <RightSidebar />
                     </ResizablePanel>
 

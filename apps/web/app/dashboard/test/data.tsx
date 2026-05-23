@@ -13,14 +13,9 @@ import {
     Building2,
     Columns2,
     Columns3,
-    Rows2,
-    Save,
     Pencil,
     Eye,
-    Plus,
     TextAlignStart,
-    LayoutGrid,
-    LayoutPanelTop,
 } from "lucide-react";
 
 export type CanvasNode = {
@@ -56,15 +51,6 @@ export const LAYOUT_DATA = [
         category: "layout",
         description: "Three equal columns side by side",
         icon: <Columns3 className="size-4" />,
-    },
-    {
-        id: "row-group",
-        label: "Row Group",
-        type: "layout-row",
-        columns: 1,
-        category: "layout",
-        description: "Group elements in a vertical row",
-        icon: <Rows2 className="size-4" />,
     }
 ] as const;
 
