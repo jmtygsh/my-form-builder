@@ -18,6 +18,9 @@ import {
     Pencil,
     Eye,
     Plus,
+    TextAlignStart,
+    LayoutGrid,
+    LayoutPanelTop,
 } from "lucide-react";
 
 export const LAYOUT_DATA = [
@@ -212,8 +215,8 @@ export const FIELD_DATA = [
 import { TabOption } from "./form-tools/HeaderTab";
 
 export const LAYOUT_BUTTON_TABS: TabOption<"elements" | "layouts">[] = [
-    { id: "layouts", label: "Layout", icon: <Pencil className="size-3.5" /> },
-    { id: "elements", label: "Form Elements", icon: <Plus className="size-3.5" /> }
+    { id: "elements", label: "Form Elements", icon: <TextAlignStart className="size-3.5" /> },
+    { id: "layouts", label: "Layout", icon: <Columns2 className="size-3.5" /> },
 ]
 
 export const VIEW_MODE_BUTTON_TABS: TabOption<"edit" | "preview">[] = [

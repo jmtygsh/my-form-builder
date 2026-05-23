@@ -23,11 +23,11 @@ export function HeaderTab<T extends string>({ tabs, activeTab, onTabChange }: He
                     type="button"
                     variant={activeTab === tab.id ? "secondary" : "ghost"}
                     size="sm"
-                    className="h-7 px-3 text-xs shadow-none"
+                    className="h-7 px-3 text-xs shadow-none cursor-pointer"
                     onClick={() => onTabChange(tab.id)}
                 >
                     {tab.icon}
-                    <span className="ml-1.5">{tab.label}</span>
+                    <span className="hover:bg-amber-100">{tab.label}</span>
                 </Button>
             ))}
         </div>

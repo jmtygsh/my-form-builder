@@ -14,12 +14,19 @@ import Canvas from "../form/Middlebar";
 import { cn } from "~/lib/utils";
 
 
+interface DraggableField {
+    id: string; // usually required for drag-and-drop libraries
+    icon: React.ReactNode;
+    label: string;
+    description: string;
+}
+
 export default function EditMode({ activeTab }: { activeTab: "elements" | "layouts" }) {
     // State to hold the items that have been dropped into the canvas
     const [canvasItems, setCanvasItems] = useState<any[]>([]);
 
     // State to hold the currently dragged item for the visual overlay
-    const [activeField, setActiveField] = useState(null);
+    const [activeField, setActiveField] = useState<DraggableField | null>(null);
 
     // Track what is being dragged so we can show it in the overlay
     function handleDragStart(event: DragStartEvent) {
