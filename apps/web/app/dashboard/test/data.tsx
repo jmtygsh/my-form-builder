@@ -11,7 +11,44 @@ import {
     Link,
     Lock,
     Building2,
+    Columns2,
+    Columns3,
+    Rows2,
+    Save,
+    Pencil,
+    Eye,
+    Plus,
 } from "lucide-react";
+
+export const LAYOUT_DATA = [
+    {
+        id: "grid-2",
+        label: "2 Columns",
+        type: "layout-grid",
+        columns: 2,
+        category: "layout",
+        description: "Two equal columns side by side",
+        icon: <Columns2 className="size-4" />,
+    },
+    {
+        id: "grid-3",
+        label: "3 Columns",
+        type: "layout-grid",
+        columns: 3,
+        category: "layout",
+        description: "Three equal columns side by side",
+        icon: <Columns3 className="size-4" />,
+    },
+    {
+        id: "row-group",
+        label: "Row Group",
+        type: "layout-row",
+        columns: 1,
+        category: "layout",
+        description: "Group elements in a vertical row",
+        icon: <Rows2 className="size-4" />,
+    }
+] as const;
 
 export const FIELD_DATA = [
     {
@@ -168,3 +205,18 @@ export const FIELD_DATA = [
         ],
     },
 ] as const;
+
+
+
+// header buttons
+import { TabOption } from "./form-tools/HeaderTab";
+
+export const LAYOUT_BUTTON_TABS: TabOption<"elements" | "layouts">[] = [
+    { id: "layouts", label: "Layout", icon: <Pencil className="size-3.5" /> },
+    { id: "elements", label: "Form Elements", icon: <Plus className="size-3.5" /> }
+]
+
+export const VIEW_MODE_BUTTON_TABS: TabOption<"edit" | "preview">[] = [
+    { id: "edit", label: "Edit", icon: <Pencil className="size-3.5" /> },
+    { id: "preview", label: "Preview", icon: <Eye className="size-3.5" /> }
+]

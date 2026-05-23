@@ -8,23 +8,23 @@ import {
 } from "~/components/ui/resizable"
 
 import { arrayMove } from "@dnd-kit/sortable";
-import { FIELD_DATA } from "../form/data";
-import Canvas from "../form/canvas";
+import { LeftSidebar } from "../form/LeftSidebar";
+import { RightSidebar } from "../form/RightSidebar";
+import Canvas from "../form/Middlebar";
 import { cn } from "~/lib/utils";
-import { SidebarItem } from "../form-sidebar/element-sidebar/SidebarItem";
 
 
-export default function EditMode() {
+export default function EditMode({ activeTab }: { activeTab: "elements" | "layouts" }) {
     // State to hold the items that have been dropped into the canvas
     const [canvasItems, setCanvasItems] = useState<any[]>([]);
 
     // State to hold the currently dragged item for the visual overlay
-    const [activeField, setActiveField] = useState<typeof FIELD_DATA[number] | null>(null);
+    const [activeField, setActiveField] = useState(null);
 
     // Track what is being dragged so we can show it in the overlay
     function handleDragStart(event: DragStartEvent) {
         const { active } = event;
-        if (active.data.current?.type === "sidebar-item") {
+        if (active.data.current?.type === "sidebar-item" || active.data.current?.type === "sidebar-layout") {
             setActiveField(active.data.current.field);
         } else if (active.data.current?.type === "canvas-item") {
             setActiveField(active.data.current.item);
@@ -47,9 +47,10 @@ export default function EditMode() {
         if (!isOverCanvasArea && !isOverCanvasItem) return;
 
         const isSidebarItem = active.data.current?.type === "sidebar-item";
+        const isSidebarLayout = active.data.current?.type === "sidebar-layout";
         const isCanvasItem = active.data.current?.type === "canvas-item";
 
-        if (isSidebarItem) {
+        if (isSidebarItem || isSidebarLayout) {
             const fieldData = active.data.current?.field;
 
             // Add the new field to the canvas state
@@ -97,15 +98,7 @@ export default function EditMode() {
                     className="rounded-lg"
                 >
                     <ResizablePanel defaultSize="20%">
-                        {/* Left Sidebar: Source of Draggable Items */}
-                        <div className="bg-muted/10 p-4 flex flex-col gap-3 h-full overflow-y-auto [&::-webkit-scrollbar]:w-0 [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full">
-                            <h2 className="font-semibold text-sm text-muted-foreground mb-1 uppercase tracking-wider shrink-0">
-                                Form Elements
-                            </h2>
-                            {FIELD_DATA.map((field) => (
-                                <SidebarItem key={field.id} field={field} />
-                            ))}
-                        </div>
+                        <LeftSidebar activeTab={activeTab} />
                     </ResizablePanel>
 
                     <ResizableHandle withHandle />
@@ -118,7 +111,7 @@ export default function EditMode() {
                     <ResizableHandle withHandle />
 
                     <ResizablePanel defaultSize="20%">
-
+                        <RightSidebar />
                     </ResizablePanel>
 
                 </ResizablePanelGroup>
@@ -127,9 +120,14 @@ export default function EditMode() {
             {/* Visual overlay for dragging outside containers */}
             <DragOverlay>
                 {activeField ? (
-                    <div className="flex items-center gap-3 rounded-md border-2 border-primary bg-card p-3 text-sm shadow-xl cursor-grabbing opacity-90 w-56">
-                        <div className="text-primary">{activeField.icon}</div>
-                        <span className="font-medium">{activeField.label}</span>
+                    <div className="border-border/60 bg-background flex w-56 items-start gap-3 rounded-lg border px-3 py-2 text-left shadow-xl cursor-grabbing opacity-90">
+                        <div className="bg-muted/50 text-foreground flex size-9 shrink-0 items-center justify-center rounded-md border">
+                            {activeField.icon}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                            <div className="text-sm font-medium leading-none truncate">{activeField.label}</div>
+                            <div className="text-muted-foreground mt-1.5 text-xs leading-snug line-clamp-2">{activeField.description}</div>
+                        </div>
                     </div>
                 ) : null}
             </DragOverlay>
