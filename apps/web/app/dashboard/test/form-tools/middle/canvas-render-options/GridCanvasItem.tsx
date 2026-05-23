@@ -55,10 +55,10 @@ function GridSlot({
     );
 }
 
-export function GridCanvasItem({ 
+export function GridCanvasItem({
     node,
-    onDelete 
-}: { 
+    onDelete
+}: {
     node: CanvasNode;
     onDelete?: (id: string) => void;
 }) {
