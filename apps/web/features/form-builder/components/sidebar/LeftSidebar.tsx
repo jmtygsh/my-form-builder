@@ -2,7 +2,6 @@ import React from "react";
 import { useDraggable } from "@dnd-kit/core";
 import { getFieldRegistryList } from "../../registry/field-registry";
 import { useBuilderStore } from "../../store/useBuilderStore";
-import { Button } from "~/components/ui/button";
 import { toast } from "sonner";
 import { cn } from "~/lib/utils";
 

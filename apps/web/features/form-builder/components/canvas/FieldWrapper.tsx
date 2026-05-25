@@ -5,6 +5,7 @@ import { GripVertical, Settings, Trash2, Copy } from "lucide-react";
 import { Field } from "../../types";
 import { FieldRegistry } from "../../registry/field-registry";
 import { useBuilderStore } from "../../store/useBuilderStore";
+import { StyledField } from "./StyledField";
 import { cn } from "~/lib/utils";
 import {
   DropdownMenu,
@@ -46,7 +47,7 @@ export const FieldWrapper = ({ field, rowId }: FieldWrapperProps) => {
   };
 
   const isSelected = selectedFieldId === field.id;
-  const isHovered = isOver && !isDragging && active?.data?.current?.type === "sidebar-item";
+  const isHovered = isOver && !isDragging;
   const registryItem = FieldRegistry[field.type];
 
   if (!registryItem) return null;
@@ -82,8 +83,10 @@ export const FieldWrapper = ({ field, rowId }: FieldWrapperProps) => {
       }}
     >
       {/* Field Content */}
-      <div className="flex-1 p-4 pointer-events-none">
-        <CanvasComponent field={field} />
+      <div className="flex-1 p-3 pointer-events-none">
+        <StyledField field={field}>
+          <CanvasComponent field={field} />
+        </StyledField>
       </div>
 
       {/* Mini Toolbar - Only visible on hover or select */}

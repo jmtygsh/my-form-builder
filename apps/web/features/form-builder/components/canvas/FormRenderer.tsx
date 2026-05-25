@@ -2,10 +2,12 @@ import React from "react";
 import { useDroppable } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { RowWrapper } from "./RowWrapper";
+import { RowDropZone } from "./RowDropZone";
 import { Button } from "~/components/ui/button";
 import { FilePenLine, Pencil, Plus } from "lucide-react";
 import { useBuilderStore } from "../../store/useBuilderStore";
 import { FieldRegistry } from "../../registry/field-registry";
+import { StyledField } from "./StyledField";
 
 export const FormRenderer = ({ isLive = false }: { isLive?: boolean }) => {
   const { form, addRow } = useBuilderStore();
@@ -13,16 +15,18 @@ export const FormRenderer = ({ isLive = false }: { isLive?: boolean }) => {
   if (isLive) {
     return (
       <div className="mx-auto max-w-4xl p-8 pb-24 space-y-6">
-        <div className="space-y-4">
+        <div className="space-y-4 border p-4 rounded-md">
           {form.rows.map((row) => (
-            <div key={row.id} className="flex gap-4 w-full">
+            <div key={row.id} className="flex gap-4 w-full ">
               {row.fields.map((field) => {
                 const registryItem = FieldRegistry[field.type];
                 if (!registryItem) return null;
                 const CanvasComponent = registryItem.canvasComponent;
                 return (
-                  <div key={field.id} className="flex-1">
-                    <CanvasComponent field={field} isLive={isLive} />
+                  <div key={field.id} className="flex-1 p-2">
+                    <StyledField field={field}>
+                      <CanvasComponent field={field} isLive={isLive} />
+                    </StyledField>
                   </div>
                 );
               })}
@@ -60,9 +64,13 @@ export const FormRenderer = ({ isLive = false }: { isLive?: boolean }) => {
               items={form.rows.map(r => r.id)}
               strategy={verticalListSortingStrategy}
             >
-              <div className="flex flex-col gap-2">
-                {form.rows.map((row) => (
-                  <RowWrapper key={row.id} row={row} />
+              <div className="flex flex-col gap-2 relative">
+                <RowDropZone index={0} />
+                {form.rows.map((row, index) => (
+                  <React.Fragment key={row.id}>
+                    <RowWrapper row={row} />
+                    <RowDropZone index={index + 1} />
+                  </React.Fragment>
                 ))}
               </div>
             </SortableContext>

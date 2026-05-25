@@ -27,6 +27,9 @@ service request form
 
 
 
+1. date is missing in native element
+2. very hard to place with drag and drop between feilds
+3. checkbox do not support yes or not  so, new ceate checkbox for native and old checkbox move to pre-built  and change the name like agree box.
 
 
 

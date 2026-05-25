@@ -38,7 +38,7 @@ export const RowWrapper = ({ row }: RowWrapperProps) => {
   };
 
   const isEmpty = row.fields.length === 0;
-  const isHovered = isOver && !isDragging && active?.data?.current?.type === "sidebar-item";
+  const isHovered = isOver && !isDragging;
 
   return (
     <div
@@ -76,7 +76,7 @@ export const RowWrapper = ({ row }: RowWrapperProps) => {
         </Button>
       </div>
 
-      <div className="p-2 min-h-[100px]">
+      <div className="flex flex-row justify-center">
         <SortableContext
           items={row.fields.map(f => f.id)}
           strategy={horizontalListSortingStrategy}

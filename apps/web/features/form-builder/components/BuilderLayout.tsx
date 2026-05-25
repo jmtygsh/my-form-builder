@@ -59,9 +59,14 @@ export const BuilderLayout = () => {
       const fieldData = active.data.current?.field;
       if (!fieldData) return;
 
-      if (overType === "Row") {
+      if (overType === "RowDropZone") {
+        const index = over.data.current?.index;
+        if (typeof index === "number") {
+          useBuilderStore.getState().addFieldToNewRow(index, fieldData.type, fieldData.defaultProps);
+        }
+      } else if (overType === "Row") {
         // Dropped onto an empty row
-        addFieldToRow(overId, fieldData.type, fieldData.defaultProps);
+        useBuilderStore.getState().addFieldToRow(overId, fieldData.type, fieldData.defaultProps);
       } else if (overType === "Field") {
         // Dropped onto another field
         const overRowId = over.data.current?.rowId;
@@ -69,22 +74,12 @@ export const BuilderLayout = () => {
           const overRow = form.rows.find(r => r.id === overRowId);
           if (overRow) {
             const overIndex = overRow.fields.findIndex(f => f.id === overId);
-            addFieldToRow(overRowId, fieldData.type, fieldData.defaultProps, overIndex);
+            useBuilderStore.getState().addFieldToRow(overRowId, fieldData.type, fieldData.defaultProps, overIndex);
           }
         }
       } else if (over.id === "canvas-droppable") {
         // Dropped on empty canvas area, create a new row with this field
-        addRow();
-        // Since state update is async, we need a slight delay or to handle this inside Zustand
-        // For now, we will add the row, and the user can drag again. 
-        // A better approach is handling this inside Zustand, but we will keep it simple.
-        setTimeout(() => {
-          const state = useBuilderStore.getState();
-          const lastRow = state.form.rows[state.form.rows.length - 1];
-          if (lastRow) {
-            state.addFieldToRow(lastRow.id, fieldData.type, fieldData.defaultProps);
-          }
-        }, 0);
+        useBuilderStore.getState().addFieldToNewRow(form.rows.length, fieldData.type, fieldData.defaultProps);
       }
       return;
     }
@@ -93,12 +88,20 @@ export const BuilderLayout = () => {
     if (activeType === "Row" && overType === "Row") {
       const oldIndex = form.rows.findIndex((r) => r.id === activeId);
       const newIndex = form.rows.findIndex((r) => r.id === overId);
-      moveRow(oldIndex, newIndex);
+      useBuilderStore.getState().moveRow(oldIndex, newIndex);
       return;
     }
 
     // Handle reordering fields
     if (activeType === "Field") {
+      if (overType === "RowDropZone") {
+        const index = over.data.current?.index;
+        if (typeof index === "number") {
+          useBuilderStore.getState().moveFieldToNewRow(activeId, index);
+        }
+        return;
+      }
+
       const activeRowId = active.data.current?.rowId;
       const overRowId = over.data.current?.rowId || (overType === "Row" ? overId : null);
 
@@ -127,7 +130,7 @@ export const BuilderLayout = () => {
   return (
     <DndContext
       sensors={sensors}
-      collisionDetection={pointerWithin}
+      collisionDetection={closestCenter}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
     >

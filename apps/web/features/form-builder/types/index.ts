@@ -1,4 +1,4 @@
-export type FieldType = "text" | "email" | "textarea" | "select" | "checkbox" | "radio" | "date" | "file" | "fullName" | "phone" | "address" | "heading" | "paragraph";
+export type FieldType = "text" | "email" | "textarea" | "select" | "checkbox" | "radio" | "date" | "file" | "fullName" | "phone" | "address" | "heading" | "paragraph" | "agreeBox";
 
 export interface FieldBaseProps {
   label: string;
@@ -9,6 +9,16 @@ export interface FieldBaseProps {
   allowedFileTypes?: string[];
   headingLevel?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
   textAlign?: "left" | "center" | "right";
+  marginTop?: string;
+  marginBottom?: string;
+  marginLeft?: string;
+  marginRight?: string;
+  paddingTop?: string;
+  paddingBottom?: string;
+  paddingLeft?: string;
+  paddingRight?: string;
+  fontSize?: "xs" | "sm" | "base" | "lg" | "xl";
+  textColor?: string;
 }
 
 export interface Field {

@@ -1,12 +1,11 @@
 import React, { useRef } from "react";
-import { Type, Mail, AlignLeft, ChevronDown, CheckSquare, CircleDot, Upload, Plus, Trash2, CloudUpload, User, Phone, MapPin, Heading, Pilcrow, AlignCenter, AlignRight } from "lucide-react";
+import { Type, Mail, AlignLeft, ChevronDown, CheckSquare, CircleDot, Upload, Plus, Trash2, CloudUpload, User, Phone, MapPin, Heading, Pilcrow, AlignCenter, AlignRight, Calendar, ListChecks } from "lucide-react";
 import { FieldRegistryItem, Field } from "../types";
 import { Input } from "~/components/ui/input";
 import { Textarea } from "~/components/ui/textarea";
 import { Label } from "~/components/ui/label";
 import { Checkbox } from "~/components/ui/checkbox";
 import { Button } from "~/components/ui/button";
-import { Switch } from "~/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group";
 import { ToggleGroup, ToggleGroupItem } from "~/components/ui/toggle-group";
@@ -76,6 +75,42 @@ const SelectCanvasComponent = ({ field, isLive }: { field: Field; isLive?: boole
         ))}
       </SelectContent>
     </Select>
+    {field.props.description && (
+      <p className="text-xs text-muted-foreground">{field.props.description}</p>
+    )}
+  </div>
+);
+
+const DateCanvasComponent = ({ field, isLive }: { field: Field; isLive?: boolean }) => (
+  <div className="flex flex-col gap-2 w-full">
+    <Label className="text-sm font-medium">
+      {field.props.label} {field.props.required && <span className="text-destructive">*</span>}
+    </Label>
+    <Input
+      type="date"
+      placeholder={field.props.placeholder}
+      readOnly={!isLive}
+      className={!isLive ? "pointer-events-none w-full" : "w-full"}
+    />
+    {field.props.description && (
+      <p className="text-xs text-muted-foreground">{field.props.description}</p>
+    )}
+  </div>
+);
+
+const CheckboxGroupCanvasComponent = ({ field, isLive }: { field: Field; isLive?: boolean }) => (
+  <div className="flex flex-col gap-3 w-full">
+    <Label className="text-sm font-medium">
+      {field.props.label} {field.props.required && <span className="text-destructive">*</span>}
+    </Label>
+    <div className={`flex flex-col gap-2 ${!isLive ? "pointer-events-none" : ""}`}>
+      {field.props.options?.map((opt, i) => (
+        <div key={i} className="flex items-center space-x-2">
+          <Checkbox id={`cbg-${field.id}-${i}`} disabled={!isLive} />
+          <Label htmlFor={`cbg-${field.id}-${i}`}>{opt}</Label>
+        </div>
+      ))}
+    </div>
     {field.props.description && (
       <p className="text-xs text-muted-foreground">{field.props.description}</p>
     )}
@@ -495,15 +530,31 @@ export const FieldRegistry: Record<string, FieldRegistryItem> = {
   checkbox: {
     type: "checkbox",
     category: "native",
-    label: "Checkbox",
-    description: "Single checkbox element",
-    icon: <CheckSquare className="w-4 h-4" />,
+    label: "Checkbox Group",
+    description: "Choose multiple options",
+    icon: <ListChecks className="w-4 h-4" />,
     defaultProps: {
-      label: "I agree to terms",
+      label: "Choose options",
+      description: "",
+      required: false,
+      options: ["Yes", "No"],
+    },
+    canvasComponent: CheckboxGroupCanvasComponent,
+    settingsComponent: BaseSettings,
+  },
+  date: {
+    type: "date",
+    category: "native",
+    label: "Date",
+    description: "Select a date",
+    icon: <Calendar className="w-4 h-4" />,
+    defaultProps: {
+      label: "Date",
+      placeholder: "mm/dd/yyyy",
       description: "",
       required: false,
     },
-    canvasComponent: CheckboxCanvasComponent,
+    canvasComponent: DateCanvasComponent,
     settingsComponent: BaseSettings,
   },
   radio: {
@@ -537,6 +588,20 @@ export const FieldRegistry: Record<string, FieldRegistryItem> = {
     settingsComponent: BaseSettings,
   },
   // --- PRE-BUILT COMPONENTS ---
+  agreeBox: {
+    type: "agreeBox",
+    category: "pre-built",
+    label: "Agree Box",
+    description: "Single checkbox for agreements",
+    icon: <CheckSquare className="w-4 h-4" />,
+    defaultProps: {
+      label: "I agree to the terms and conditions",
+      description: "",
+      required: true,
+    },
+    canvasComponent: CheckboxCanvasComponent,
+    settingsComponent: BaseSettings,
+  },
   heading: {
     type: "heading",
     category: "pre-built",
