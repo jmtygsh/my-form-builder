@@ -14,7 +14,7 @@ interface RowWrapperProps {
 
 export const RowWrapper = ({ row }: RowWrapperProps) => {
   const { deleteRow, addRow } = useBuilderStore();
-  
+
   const {
     attributes,
     listeners,
@@ -22,6 +22,8 @@ export const RowWrapper = ({ row }: RowWrapperProps) => {
     transform,
     transition,
     isDragging,
+    isOver,
+    active,
   } = useSortable({
     id: row.id,
     data: {
@@ -36,21 +38,23 @@ export const RowWrapper = ({ row }: RowWrapperProps) => {
   };
 
   const isEmpty = row.fields.length === 0;
+  const isHovered = isOver && !isDragging && active?.data?.current?.type === "sidebar-item";
 
   return (
     <div
       ref={setNodeRef}
       style={style}
       className={cn(
-        "group relative rounded-xl border-2 border-transparent transition-colors",
+        "group relative rounded-xl border-2 border-transparent transition-all",
         "hover:border-border/60",
         isDragging && "opacity-50 border-primary border-dashed",
-        isEmpty && "border-dashed border-border"
+        isEmpty && "border-dashed border-border",
+        isHovered && "border-primary border-dashed bg-primary/5 ring-4 ring-primary/20 scale-[1.01] z-10"
       )}
     >
       {/* Row Handle (Left side) */}
-      <div 
-        {...attributes} 
+      <div
+        {...attributes}
         {...listeners}
         className={cn(
           "absolute -left-8 top-1/2 -translate-y-1/2 p-1.5 cursor-grab active:cursor-grabbing",
@@ -73,20 +77,20 @@ export const RowWrapper = ({ row }: RowWrapperProps) => {
       </div>
 
       <div className="p-2 min-h-[100px]">
-        <SortableContext 
-          items={row.fields.map(f => f.id)} 
+        <SortableContext
+          items={row.fields.map(f => f.id)}
           strategy={horizontalListSortingStrategy}
         >
           <div className="flex gap-4 w-full">
             {row.fields.map((field) => (
-              <div 
-                key={field.id} 
+              <div
+                key={field.id}
                 className="flex-1 min-w-0" // This handles the automatic division (flex-1)
               >
                 <FieldWrapper field={field} rowId={row.id} />
               </div>
             ))}
-            
+
             {isEmpty && (
               <div className="flex-1 flex items-center justify-center h-[80px] text-muted-foreground text-sm">
                 Drag fields here

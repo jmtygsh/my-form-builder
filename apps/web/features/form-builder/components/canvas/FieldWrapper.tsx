@@ -29,6 +29,8 @@ export const FieldWrapper = ({ field, rowId }: FieldWrapperProps) => {
     transform,
     transition,
     isDragging,
+    isOver,
+    active,
   } = useSortable({
     id: field.id,
     data: {
@@ -44,6 +46,7 @@ export const FieldWrapper = ({ field, rowId }: FieldWrapperProps) => {
   };
 
   const isSelected = selectedFieldId === field.id;
+  const isHovered = isOver && !isDragging && active?.data?.current?.type === "sidebar-item";
   const registryItem = FieldRegistry[field.type];
 
   if (!registryItem) return null;
@@ -68,9 +71,10 @@ export const FieldWrapper = ({ field, rowId }: FieldWrapperProps) => {
       ref={setNodeRef}
       style={style}
       className={cn(
-        "group relative flex rounded-md border border-transparent hover:border-border/50 bg-background/50 w-full",
+        "group relative flex rounded-md border border-transparent hover:border-border/50 bg-background/50 w-full transition-all",
         isDragging && "opacity-50 border-primary border-dashed",
-        isSelected && "border-primary hover:border-primary ring-1 ring-primary/20"
+        isSelected && "border-primary hover:border-primary ring-1 ring-primary/20",
+        isHovered && "ring-2 ring-primary ring-offset-2 scale-[1.02] bg-primary/5 z-10"
       )}
       onClick={(e) => {
         e.stopPropagation();

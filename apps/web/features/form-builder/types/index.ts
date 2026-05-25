@@ -1,10 +1,14 @@
-export type FieldType = "text" | "email" | "textarea" | "select" | "checkbox" | "radio" | "date" | "file";
+export type FieldType = "text" | "email" | "textarea" | "select" | "checkbox" | "radio" | "date" | "file" | "fullName" | "phone" | "address" | "heading" | "paragraph";
 
 export interface FieldBaseProps {
   label: string;
   description?: string;
   placeholder?: string;
   required?: boolean;
+  options?: string[];
+  allowedFileTypes?: string[];
+  headingLevel?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
+  textAlign?: "left" | "center" | "right";
 }
 
 export interface Field {
@@ -24,8 +28,11 @@ export interface FormSchema {
   rows: Row[];
 }
 
+export type FieldCategory = "native" | "pre-built";
+
 export interface FieldRegistryItem {
   type: FieldType;
+  category: FieldCategory;
   label: string;
   description: string;
   icon: React.ReactNode;

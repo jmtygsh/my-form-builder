@@ -40,6 +40,9 @@ const DraggableSidebarItem = ({ field, onClick }: { field: any, onClick: () => v
 
 export const LeftSidebar = () => {
   const fields = getFieldRegistryList();
+  const nativeFields = fields.filter(f => f.category === "native");
+  const preBuiltFields = fields.filter(f => f.category === "pre-built");
+
   const { form, addFieldToRow, addRow } = useBuilderStore();
 
   const handleAddField = (fieldType: string, defaultProps: any) => {
@@ -62,12 +65,13 @@ export const LeftSidebar = () => {
   return (
     <div className="bg-muted/10 p-4 flex flex-col gap-3 h-full overflow-y-auto [&::-webkit-scrollbar]:w-0 [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full border-r">
       <div className="flex flex-col gap-6 pb-6">
-        {/* Native Fields Group */}
+
+        {/* Pre-built Components Group */}
         <div className="flex flex-col gap-3">
           <h2 className="font-semibold text-xs text-muted-foreground mb-1 uppercase tracking-wider shrink-0">
-            Native HTML Elements
+            Pre-Built Components
           </h2>
-          {fields.map((field) => (
+          {preBuiltFields.map((field) => (
             <DraggableSidebarItem
               key={field.type}
               field={field}
@@ -75,6 +79,23 @@ export const LeftSidebar = () => {
             />
           ))}
         </div>
+
+
+        {/* Native Fields Group */}
+        <div className="flex flex-col gap-3">
+          <h2 className="font-semibold text-xs text-muted-foreground mb-1 uppercase tracking-wider shrink-0">
+            Native HTML Elements
+          </h2>
+          {nativeFields.map((field) => (
+            <DraggableSidebarItem
+              key={field.type}
+              field={field}
+              onClick={() => handleAddField(field.type, field.defaultProps)}
+            />
+          ))}
+        </div>
+
+
       </div>
     </div>
   );
