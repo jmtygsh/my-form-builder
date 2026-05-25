@@ -1,0 +1,98 @@
+import React from "react";
+import { useDroppable } from "@dnd-kit/core";
+import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import { RowWrapper } from "./RowWrapper";
+import { Button } from "~/components/ui/button";
+import { FilePenLine, Pencil, Plus } from "lucide-react";
+import { Input } from "~/components/ui/input";
+import { useBuilderStore } from "../../store/useBuilderStore";
+import { FieldRegistry } from "../../registry/field-registry";
+
+export const FormRenderer = ({ isLive = false }: { isLive?: boolean }) => {
+  const { form, setFormTitle, addRow } = useBuilderStore();
+
+  if (isLive) {
+    return (
+      <div className="mx-auto max-w-4xl p-8 pb-24 space-y-6">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold">{form.name}</h1>
+        </div>
+
+        <div className="space-y-4">
+          {form.rows.map((row) => (
+            <div key={row.id} className="flex gap-4 w-full">
+              {row.fields.map((field) => {
+                const registryItem = FieldRegistry[field.type];
+                if (!registryItem) return null;
+                const CanvasComponent = registryItem.canvasComponent;
+                return (
+                  <div key={field.id} className="flex-1">
+                    <CanvasComponent field={field} isLive={isLive} />
+                  </div>
+                );
+              })}
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  const { setNodeRef } = useDroppable({
+    id: "canvas-droppable",
+    data: {
+      type: "Canvas",
+    },
+  });
+
+  return (
+    <div ref={setNodeRef} className="w-full px-4 py-10 md:px-10 min-h-full">
+      <div className="max-w-[880px] mx-auto w-full">
+
+        <div className="mb-10">
+          <div className="flex items-center gap-3">
+            <Input
+              value={form.name}
+              onChange={(e) => setFormTitle(e.target.value)}
+              className="h-auto text-2xl md:text-3xl font-semibold tracking-tight border-none shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent w-full px-0 py-0"
+              placeholder="Form title"
+            />
+            <Pencil className="size-4 text-muted-foreground shrink-0" />
+          </div>
+        </div>
+
+        {form.rows.length === 0 ? (
+          <div className="flex flex-col items-center justify-center gap-3 rounded-lg border border-dashed border-border/60 bg-muted/5 px-6 py-12 text-center">
+            <div className="flex size-10 items-center justify-center rounded-full border bg-background">
+              <FilePenLine className="text-muted-foreground size-4" />
+            </div>
+            <div>
+              <div className="text-base font-semibold text-foreground">Start building your form</div>
+              <div className="mt-1 text-sm text-muted-foreground mb-4">Add your first row to start dragging and dropping fields.</div>
+            </div>
+          </div>
+        ) : (
+          <>
+            <SortableContext
+              items={form.rows.map(r => r.id)}
+              strategy={verticalListSortingStrategy}
+            >
+              <div className="flex flex-col gap-2">
+                {form.rows.map((row) => (
+                  <RowWrapper key={row.id} row={row} />
+                ))}
+              </div>
+            </SortableContext>
+
+            <div className="pt-6 flex justify-center">
+              <Button variant="outline" size="sm" onClick={() => addRow()}>
+                <Plus size="3" />
+                Add Row
+              </Button>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+};

@@ -1,3 +1,39 @@
+
+
+
+
+
+
+
+https://www.jotform.com/form-templates/category/feedback
+
+client Onboarding form
+https://www.jotform.com/form-templates/client-onboarding-form
+
+-----------
+
+Customer feedback form,
+event registration form,
+vendor registration form,
+employee registration form,
+purchase order form,
+product feedback form,
+customer support form, 
+Course enrollment form,
+appointment scheduling form,
+travel booking form,
+service request form
+
+
+
+
+
+
+
+
+
+
+
 # Turborepo starter
 
 This Turborepo starter is maintained by the Turborepo core team.
