@@ -134,7 +134,7 @@ export const BuilderLayout = () => {
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
     >
-      <div className="flex h-full w-full bg-background overflow-hidden" onClick={() => selectField(null)}>
+      <div className="flex h-full w-full bg-background overflow-hidden" onClick={() => { selectField(null); useBuilderStore.getState().selectRow(null); }}>
         <ResizablePanelGroup orientation="horizontal" className="rounded-lg">
           {/* Left Palette */}
           <ResizablePanel defaultSize={20} >

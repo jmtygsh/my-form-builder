@@ -4,16 +4,22 @@ import { FormSchema, Row, Field, FieldType } from "../types";
 interface BuilderState {
   form: FormSchema;
   selectedFieldId: string | null;
+  selectedRowId: string | null;
+  selectedCanvas: boolean;
 
   // Actions
   setForm: (form: FormSchema) => void;
   setFormTitle: (title: string) => void;
+  updateFormProps: (updates: Partial<FormSchema["props"]>) => void;
   selectField: (id: string | null) => void;
+  selectRow: (id: string | null) => void;
+  selectCanvas: () => void;
 
   // Row Actions
   addRow: (index?: number) => void;
   deleteRow: (rowId: string) => void;
   moveRow: (fromIndex: number, toIndex: number) => void;
+  updateRow: (rowId: string, updates: Partial<Row["props"]>) => void;
 
   // Field Actions
   addFieldToRow: (rowId: string, fieldType: FieldType, defaultProps: any, index?: number) => void;
@@ -36,17 +42,28 @@ export const useBuilderStore = create<BuilderState>((set) => ({
     rows: [],
   },
   selectedFieldId: null,
-
-
+  selectedRowId: null,
+  selectedCanvas: false,
 
   setForm: (form) => set({ form }),
 
   setFormTitle: (name) => set((state) => ({ form: { ...state.form, name } })),
 
-  selectField: (id) => set({ selectedFieldId: id }),
+  updateFormProps: (updates) => set((state) => ({
+    form: {
+      ...state.form,
+      props: { ...state.form.props, ...updates }
+    }
+  })),
+
+  selectField: (id) => set({ selectedFieldId: id, selectedRowId: null, selectedCanvas: false }),
+
+  selectRow: (id) => set({ selectedRowId: id, selectedFieldId: null, selectedCanvas: false }),
+
+  selectCanvas: () => set({ selectedCanvas: true, selectedFieldId: null, selectedRowId: null }),
 
   addRow: (index) => set((state) => {
-    const newRow: Row = { id: `row_${Date.now()}`, fields: [] };
+    const newRow: Row = { id: `row_${Date.now()}`, fields: [], props: { alignItems: "start", justifyContent: "start" } };
     const newRows = [...state.form.rows];
     if (typeof index === "number") {
       newRows.splice(index, 0, newRow);
@@ -63,7 +80,8 @@ export const useBuilderStore = create<BuilderState>((set) => ({
     },
     selectedFieldId: state.selectedFieldId && state.form.rows.find(r => r.id === rowId)?.fields.some(f => f.id === state.selectedFieldId)
       ? null
-      : state.selectedFieldId
+      : state.selectedFieldId,
+    selectedRowId: state.selectedRowId === rowId ? null : state.selectedRowId
   })),
 
   moveRow: (fromIndex, toIndex) => set((state) => {
@@ -74,6 +92,15 @@ export const useBuilderStore = create<BuilderState>((set) => ({
     }
     return { form: { ...state.form, rows: newRows } };
   }),
+
+  updateRow: (rowId, updates) => set((state) => ({
+    form: {
+      ...state.form,
+      rows: state.form.rows.map((row) =>
+        row.id === rowId ? { ...row, props: { ...row.props, ...updates } } : row
+      ),
+    }
+  })),
 
   addFieldToRow: (rowId, fieldType, defaultProps, index) => set((state) => {
     const newField: Field = {

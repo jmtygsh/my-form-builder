@@ -1,7 +1,8 @@
 import React, { useRef } from "react";
-import { Type, Mail, AlignLeft, ChevronDown, CheckSquare, CircleDot, Upload, Plus, Trash2, CloudUpload, User, Phone, MapPin, Heading, Pilcrow, AlignCenter, AlignRight, Calendar, ListChecks } from "lucide-react";
+import { Type, Mail, AlignLeft, ChevronDown, CheckSquare, CircleDot, Upload, Plus, Trash2, CloudUpload, User, Phone, MapPin, Heading, Pilcrow, AlignCenter, AlignRight, Calendar, ListChecks, Link as LinkIcon, Send } from "lucide-react";
 import { FieldRegistryItem, Field } from "../types";
 import { Input } from "~/components/ui/input";
+import { ColorPickerInput } from "~/components/ui/color-picker";
 import { Textarea } from "~/components/ui/textarea";
 import { Label } from "~/components/ui/label";
 import { Checkbox } from "~/components/ui/checkbox";
@@ -12,6 +13,54 @@ import { ToggleGroup, ToggleGroupItem } from "~/components/ui/toggle-group";
 import { toast } from "sonner";
 
 // --- CANAVAS COMPONENTS ---
+const SectionHeaderCanvasComponent = ({ field }: { field: Field; isLive?: boolean }) => {
+  const level = field.props.headingLevel || "h2";
+  const Tag = level as keyof React.JSX.IntrinsicElements;
+  const headingAlign = field.props.textAlign || "left";
+  const descAlign = field.props.descriptionTextAlign || "left";
+
+  const sizeClasses = {
+    h1: "text-4xl font-bold tracking-tight",
+    h2: "text-3xl font-semibold tracking-tight",
+    h3: "text-2xl font-semibold tracking-tight",
+    h4: "text-xl font-medium",
+    h5: "text-lg font-medium",
+    h6: "text-base font-medium",
+  };
+
+  const alignClasses = {
+    left: "text-left",
+    center: "text-center",
+    right: "text-right",
+  };
+
+  const descSizeClasses = {
+    xs: "text-xs",
+    sm: "text-sm",
+    base: "text-base",
+    lg: "text-lg",
+    xl: "text-xl",
+  };
+
+  return (
+    <div className="w-full flex flex-col gap-1.5">
+      {React.createElement(
+        Tag,
+        { className: `${sizeClasses[level as keyof typeof sizeClasses] || sizeClasses.h2} ${alignClasses[headingAlign as keyof typeof alignClasses]}` },
+        field.props.label
+      )}
+      {field.props.description && (
+        <p
+          className={`text-muted-foreground whitespace-pre-wrap leading-relaxed ${alignClasses[descAlign as keyof typeof alignClasses]} ${descSizeClasses[(field.props.descriptionFontSize || "sm") as keyof typeof descSizeClasses]}`}
+          style={field.props.descriptionTextColor ? { color: field.props.descriptionTextColor } : undefined}
+        >
+          {field.props.description}
+        </p>
+      )}
+    </div>
+  );
+};
+
 const HeadingCanvasComponent = ({ field }: { field: Field; isLive?: boolean }) => {
   const level = field.props.headingLevel || "h2";
   const Tag = level as keyof React.JSX.IntrinsicElements;
@@ -33,7 +82,7 @@ const HeadingCanvasComponent = ({ field }: { field: Field; isLive?: boolean }) =
   };
 
   return (
-    <div className="w-full py-3">
+    <div className="w-full">
       {React.createElement(
         Tag,
         { className: `${sizeClasses[level as keyof typeof sizeClasses] || sizeClasses.h2} ${alignClasses[align as keyof typeof alignClasses]}` },
@@ -52,7 +101,7 @@ const ParagraphCanvasComponent = ({ field }: { field: Field; isLive?: boolean })
   };
 
   return (
-    <div className="w-full py-2">
+    <div className="w-full">
       <p className={`text-sm text-foreground whitespace-pre-wrap leading-relaxed ${alignClasses[align as keyof typeof alignClasses]}`}>
         {field.props.description}
       </p>
@@ -251,12 +300,78 @@ const TextareaCanvasComponent = ({ field, isLive }: { field: Field; isLive?: boo
   </div>
 );
 
+const ButtonCanvasComponent = ({ field, isLive }: { field: Field; isLive?: boolean }) => {
+  const align = field.props.textAlign || "left";
+  const alignClasses = {
+    left: "justify-start",
+    center: "justify-center",
+    right: "justify-end",
+  };
+
+  const buttonStyle: React.CSSProperties = {
+    backgroundColor: field.props.buttonColor || undefined,
+    color: field.props.textColor || undefined,
+    opacity: field.props.buttonHoverOpacity ? undefined : undefined, // handled via inline hover if needed, or we use a style tag
+  };
+
+  const hasCustomColor = !!field.props.buttonColor || !!field.props.buttonHoverColor || !!field.props.buttonHoverOpacity || !!field.props.textColor || !!field.props.buttonHoverTextColor;
+  const hoverColor = field.props.buttonHoverColor || field.props.buttonColor;
+  const hoverTextColor = field.props.buttonHoverTextColor || field.props.textColor;
+  const hoverOpacity = field.props.buttonHoverOpacity || "0.9";
+
+  const id = `btn-${field.id}`;
+
+  const Content = () => (
+    <>
+      {hasCustomColor && (
+        <style dangerouslySetInnerHTML={{
+          __html: `
+          #${id} {
+            background-color: ${field.props.buttonColor || "var(--primary)"};
+            color: ${field.props.textColor || "var(--primary-foreground)"};
+            transition: all 0.2s ease;
+          }
+          #${id}:hover:not(:disabled) {
+            background-color: ${hoverColor || "var(--primary)"};
+            color: ${hoverTextColor || "var(--primary-foreground)"};
+            opacity: ${hoverOpacity};
+          }
+        `}} />
+      )}
+      <Button
+        id={id}
+        type={field.type === "submitButton" ? "submit" : "button"}
+        disabled={!isLive}
+        size={field.props.buttonSize || "default"}
+        style={hasCustomColor ? undefined : buttonStyle}
+        className={hasCustomColor ? (!isLive ? "pointer-events-none" : "") : (!isLive ? "pointer-events-none hover:opacity-90" : "hover:opacity-90")}
+      >
+        <span style={{ fontSize: field.props.fontSize === "xs" ? "0.75rem" : field.props.fontSize === "sm" ? "0.875rem" : field.props.fontSize === "lg" ? "1.125rem" : field.props.fontSize === "xl" ? "1.25rem" : "1rem" }}>
+          {field.props.label}
+        </span>
+      </Button>
+    </>
+  );
+
+  return (
+    <div className={`flex w-full ${alignClasses[align as keyof typeof alignClasses]}`}>
+      {field.type === "button" && field.props.url && isLive ? (
+        <a href={field.props.url} target="_blank" rel="noopener noreferrer">
+          <Content />
+        </a>
+      ) : (
+        <Content />
+      )}
+    </div>
+  );
+};
+
 
 // --- SETTINGS COMPONENTS ---
 const TypographySettings = ({ field, updateField }: { field: Field, updateField: (p: any) => void }) => (
   <div className="space-y-6 pb-4">
     <div className="space-y-4">
-      {field.type === "heading" && (
+      {(field.type === "heading" || field.type === "sectionHeader") && (
         <>
           <div className="space-y-1.5">
             <Label className="text-xs font-medium text-muted-foreground">Heading Text</Label>
@@ -284,7 +399,7 @@ const TypographySettings = ({ field, updateField }: { field: Field, updateField:
             </Select>
           </div>
           <div className="space-y-1.5">
-            <Label className="text-xs font-medium text-muted-foreground">Alignment</Label>
+            <Label className="text-xs font-medium text-muted-foreground">Heading Alignment</Label>
             <ToggleGroup
               type="single"
               value={field.props.textAlign || "left"}
@@ -306,6 +421,65 @@ const TypographySettings = ({ field, updateField }: { field: Field, updateField:
           </div>
         </>
       )}
+
+      {field.type === "sectionHeader" && (
+        <div className="pt-4 border-t border-border/50 space-y-4">
+          <div className="space-y-1.5">
+            <Label className="text-xs font-medium text-muted-foreground">Paragraph Text</Label>
+            <Textarea
+              className="text-sm min-h-[80px] resize-y"
+              value={field.props.description || ""}
+              onChange={(e) => updateField({ description: e.target.value })}
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-xs font-medium text-muted-foreground">Paragraph Font Size</Label>
+            <Select
+              value={field.props.descriptionFontSize || "sm"}
+              onValueChange={(val) => updateField({ descriptionFontSize: val })}
+            >
+              <SelectTrigger className="h-8 text-sm"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="xs">Extra Small (xs)</SelectItem>
+                <SelectItem value="sm">Small (sm)</SelectItem>
+                <SelectItem value="base">Base (base)</SelectItem>
+                <SelectItem value="lg">Large (lg)</SelectItem>
+                <SelectItem value="xl">Extra Large (xl)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-xs font-medium text-muted-foreground">Paragraph Text Color</Label>
+            <ColorPickerInput
+              value={field.props.descriptionTextColor}
+              placeholder="Inherit"
+              onChange={(val) => updateField({ descriptionTextColor: val })}
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-xs font-medium text-muted-foreground">Paragraph Alignment</Label>
+            <ToggleGroup
+              type="single"
+              value={field.props.descriptionTextAlign || "left"}
+              onValueChange={(val) => {
+                if (val) updateField({ descriptionTextAlign: val });
+              }}
+              className="justify-start"
+            >
+              <ToggleGroupItem value="left" aria-label="Left align">
+                <AlignLeft className="w-4 h-4" />
+              </ToggleGroupItem>
+              <ToggleGroupItem value="center" aria-label="Center align">
+                <AlignCenter className="w-4 h-4" />
+              </ToggleGroupItem>
+              <ToggleGroupItem value="right" aria-label="Right align">
+                <AlignRight className="w-4 h-4" />
+              </ToggleGroupItem>
+            </ToggleGroup>
+          </div>
+        </div>
+      )}
+
       {field.type === "paragraph" && (
         <>
           <div className="space-y-1.5">
@@ -343,17 +517,133 @@ const TypographySettings = ({ field, updateField }: { field: Field, updateField:
   </div>
 );
 
-const BaseSettings = ({ field, updateField }: { field: Field, updateField: (p: any) => void }) => (
+const ButtonSettings = ({ field, updateField }: { field: Field, updateField: (p: any) => void }) => (
   <div className="flex flex-col gap-6">
     <div className="space-y-2 mt-3">
-      <Label>Label</Label>
+      <Label>{field.type === "button" || field.type === "submitButton" ? "Button Text" : "Label"}</Label>
       <Input
         value={field.props.label}
         onChange={(e) => updateField({ label: e.target.value })}
       />
     </div>
 
-    {field.type !== "checkbox" && field.type !== "radio" && field.type !== "file" && (
+    {field.type === "button" && (
+      <div className="space-y-2">
+        <Label>URL (Link)</Label>
+        <Input
+          placeholder="https://example.com"
+          value={field.props.url || ""}
+          onChange={(e) => updateField({ url: e.target.value })}
+        />
+      </div>
+    )}
+
+    <div className="space-y-1.5">
+      <Label className="text-xs font-medium text-muted-foreground">Alignment</Label>
+      <ToggleGroup
+        type="single"
+        value={field.props.textAlign || "left"}
+        onValueChange={(val) => {
+          if (val) updateField({ textAlign: val });
+        }}
+        className="justify-start"
+      >
+        <ToggleGroupItem value="left" aria-label="Left align">
+          <AlignLeft className="w-4 h-4" />
+        </ToggleGroupItem>
+        <ToggleGroupItem value="center" aria-label="Center align">
+          <AlignCenter className="w-4 h-4" />
+        </ToggleGroupItem>
+        <ToggleGroupItem value="right" aria-label="Right align">
+          <AlignRight className="w-4 h-4" />
+        </ToggleGroupItem>
+      </ToggleGroup>
+    </div>
+
+    <div className="space-y-1.5">
+      <Label className="text-xs font-medium text-muted-foreground">Button Size</Label>
+      <Select
+        value={field.props.buttonSize || "default"}
+        onValueChange={(val) => updateField({ buttonSize: val })}
+      >
+        <SelectTrigger className="h-8 text-sm"><SelectValue /></SelectTrigger>
+        <SelectContent>
+          <SelectItem value="sm">Small</SelectItem>
+          <SelectItem value="default">Default</SelectItem>
+          <SelectItem value="lg">Large</SelectItem>
+        </SelectContent>
+      </Select>
+    </div>
+
+    <div className="space-y-1.5">
+      <Label className="text-xs font-medium text-muted-foreground">Background Color</Label>
+      <ColorPickerInput
+        value={field.props.buttonColor}
+        placeholder="Default (Theme Primary)"
+        onChange={(val) => updateField({ buttonColor: val })}
+      />
+    </div>
+
+    <div className="h-px bg-border w-full" />
+    <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Hover States</h4>
+
+    <div className="space-y-1.5">
+      <Label className="text-xs font-medium text-muted-foreground">Hover Background Color</Label>
+      <ColorPickerInput
+        value={field.props.buttonHoverColor}
+        placeholder="Inherit"
+        onChange={(val) => updateField({ buttonHoverColor: val })}
+      />
+    </div>
+
+    <div className="space-y-1.5">
+      <Label className="text-xs font-medium text-muted-foreground">Hover Text Color</Label>
+      <ColorPickerInput
+        value={field.props.buttonHoverTextColor}
+        placeholder="Inherit"
+        onChange={(val) => updateField({ buttonHoverTextColor: val })}
+      />
+    </div>
+
+    <div className="space-y-1.5">
+      <Label className="text-xs font-medium text-muted-foreground">Hover Opacity</Label>
+      <Input
+        type="number"
+        min="0"
+        max="1"
+        step="0.1"
+        className="h-8 text-sm"
+        value={field.props.buttonHoverOpacity || ""}
+        placeholder="0.9"
+        onChange={(e) => updateField({ buttonHoverOpacity: e.target.value })}
+      />
+    </div>
+
+  </div>
+);
+
+const BaseSettings = ({ field, updateField }: { field: Field, updateField: (p: any) => void }) => (
+  <div className="flex flex-col gap-6">
+    <div className="space-y-2 mt-3">
+      <Label>{field.type === "button" || field.type === "submitButton" ? "Button Text" : "Label"}</Label>
+      <Input
+        value={field.props.label}
+        onChange={(e) => updateField({ label: e.target.value })}
+      />
+    </div>
+
+    {field.type === "button" && (
+      <div className="space-y-2">
+        <Label>URL (Link)</Label>
+        <Input
+          placeholder="https://example.com"
+          value={field.props.url || ""}
+          onChange={(e) => updateField({ url: e.target.value })}
+        />
+      </div>
+    )}
+
+    {field.type !== "checkbox" && field.type !== "radio" && field.type !== "file" && field.type !== "button" && field.type !== "submitButton" && (
       <div className="space-y-2">
         <Label>Placeholder</Label>
         <Input
@@ -363,13 +653,15 @@ const BaseSettings = ({ field, updateField }: { field: Field, updateField: (p: a
       </div>
     )}
 
-    <div className="space-y-2">
-      <Label>Description</Label>
-      <Input
-        value={field.props.description || ""}
-        onChange={(e) => updateField({ description: e.target.value })}
-      />
-    </div>
+    {field.type !== "button" && field.type !== "submitButton" && (
+      <div className="space-y-2">
+        <Label>Description</Label>
+        <Input
+          value={field.props.description || ""}
+          onChange={(e) => updateField({ description: e.target.value })}
+        />
+      </div>
+    )}
 
     {field.props.options !== undefined && (
       <div className="space-y-2">
@@ -451,30 +743,31 @@ const BaseSettings = ({ field, updateField }: { field: Field, updateField: (p: a
       </>
     )}
 
-    <div className="flex items-center gap-4 overflow-hidden bg-accent py-1.5 px-2 rounded-md">
-      <div className="space-y-0.5">
-        <Label className="text-sm">Required</Label>
+    {field.type !== "button" && field.type !== "submitButton" && (
+      <div className="flex items-center gap-4 overflow-hidden bg-accent py-1.5 px-2 rounded-md">
+        <div className="space-y-0.5">
+          <Label className="text-sm">Required</Label>
+        </div>
 
-      </div>
-
-      <div className="space-y-3">
-        <div
-          onClick={() =>
-            updateField({ required: !field.props.required })
-          }
-        >
-
-          <Checkbox
-            id="required-checkbox"
-            checked={!!field.props.required}
-            onCheckedChange={(checked) =>
-              updateField({ required: !!checked })
+        <div className="space-y-3">
+          <div
+            onClick={() =>
+              updateField({ required: !field.props.required })
             }
-            className="pointer-events-none mr-1"
-          />
+          >
+
+            <Checkbox
+              id="required-checkbox"
+              checked={!!field.props.required}
+              onCheckedChange={(checked) =>
+                updateField({ required: !!checked })
+              }
+              className="pointer-events-none mr-1"
+            />
+          </div>
         </div>
       </div>
-    </div>
+    )}
   </div>
 );
 
@@ -587,6 +880,21 @@ export const FieldRegistry: Record<string, FieldRegistryItem> = {
     canvasComponent: FileCanvasComponent,
     settingsComponent: BaseSettings,
   },
+  button: {
+    type: "button",
+    category: "native",
+    label: "Link Button",
+    description: "Button that links to a URL",
+    icon: <LinkIcon className="w-4 h-4" />,
+    defaultProps: {
+      label: "Click Here",
+      url: "https://google.com",
+      textAlign: "center",
+      buttonSize: "default",
+    },
+    canvasComponent: ButtonCanvasComponent,
+    settingsComponent: ButtonSettings,
+  },
   // --- PRE-BUILT COMPONENTS ---
   agreeBox: {
     type: "agreeBox",
@@ -626,6 +934,24 @@ export const FieldRegistry: Record<string, FieldRegistryItem> = {
       description: "Type your paragraph text here. Use this to provide extra context, instructions, or information to the users filling out this form.",
     },
     canvasComponent: ParagraphCanvasComponent,
+    settingsComponent: TypographySettings,
+  },
+
+  sectionHeader: {
+    type: "sectionHeader",
+    category: "pre-built",
+    label: "Section Header",
+    description: "Heading with description text",
+    icon: <Heading className="w-4 h-4" />,
+    defaultProps: {
+      label: "Section Title",
+      description: "Provide some details about this section here.",
+      headingLevel: "h2",
+      textAlign: "left",
+      descriptionTextAlign: "left",
+      descriptionFontSize: "sm",
+    },
+    canvasComponent: SectionHeaderCanvasComponent,
     settingsComponent: TypographySettings,
   },
   fullName: {
@@ -687,6 +1013,20 @@ export const FieldRegistry: Record<string, FieldRegistryItem> = {
     },
     canvasComponent: TextareaCanvasComponent,
     settingsComponent: BaseSettings,
+  },
+  submitButton: {
+    type: "submitButton",
+    category: "pre-built",
+    label: "Submit Button",
+    description: "Form submission button",
+    icon: <Send className="w-4 h-4" />,
+    defaultProps: {
+      label: "Submit Form",
+      textAlign: "center",
+      buttonSize: "default",
+    },
+    canvasComponent: ButtonCanvasComponent,
+    settingsComponent: ButtonSettings,
   }
 };
 
