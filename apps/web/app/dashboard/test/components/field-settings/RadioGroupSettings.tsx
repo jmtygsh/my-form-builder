@@ -56,11 +56,11 @@ export function RadioGroupSettings({ props, onChange }: RadioGroupSettingsProps)
                                 value={option.label}
                                 onChange={(e) => updateOption(index, "label", e.target.value)}
                             />
-                            <Input
+                            {/* <Input
                                 placeholder="Value"
                                 value={option.value}
                                 onChange={(e) => updateOption(index, "value", e.target.value)}
-                            />
+                            /> */}
                             <Button
                                 type="button"
                                 variant="ghost"
