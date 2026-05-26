@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useForm, Controller } from "react-hook-form";
 import { toast } from "sonner";
 import { Eye, EyeOff, ChevronLeft } from "lucide-react";
+import { useRive, Layout, Fit, Alignment } from "@rive-app/react-canvas";
 
 import { cn } from "../../lib/utils";
 import { Button } from "../ui/button";
@@ -37,6 +38,16 @@ export function SignUpForm({
     const { createUserWithEmailAndPasswordAsync } = useSignUp();
     const [submitError, setSubmitError] = useState<string | null>(null);
     const [showPassword, setShowPassword] = useState(false);
+
+    const { RiveComponent } = useRive({
+        src: "/riv/tax-planning.riv",
+        autoplay: true,
+        stateMachines: "state_tax-planning",
+        layout: new Layout({
+            fit: Fit.Contain,
+            alignment: Alignment.Center,
+        }),
+    });
 
     const {
         register,
@@ -83,7 +94,7 @@ export function SignUpForm({
 
             <div className="flex-1 flex flex-col relative z-50">
                 {/* Back Button */}
-                <div className="absolute top-6 left-6">
+                <div className="absolute top-6 left-6 z-10">
                     <Button
                         variant="outline"
                         size="icon"
@@ -104,10 +115,12 @@ export function SignUpForm({
                     <div className="w-full max-w-[360px] ">
 
                         <div className="flex items-center justify-center gap-2.5 mb-6 absolute top-10 left-1/2 -translate-x-1/2">
-                            <div className="w-5 h-5 bg-foreground rotate-45 flex items-center justify-center rounded-[3px]">
-                                <div className="w-1.5 h-1.5 bg-background rounded-[1px] -rotate-45" />
-                            </div>
-                            <span className="font-bold text-xl tracking-tight text-foreground dark:text-white">MakeMyForm</span>
+                            <Link href="/" className="flex items-center gap-2">
+                                <span className="font-script text-3xl md:text-4xl text-foreground leading-none -mt-1 tracking-tight">
+                                    mmf.
+                                </span>
+
+                            </Link>
                         </div>
                         <h1 className="text-center text-xl font-medium text-foreground mb-12">Create your account for free!</h1>
 
@@ -227,118 +240,17 @@ export function SignUpForm({
 
             <div className="hidden lg:block w-[48%] max-w-3xl p-4 pl-0">
                 <div className="w-full h-full bg-background-secondary rounded-xl p-12 flex flex-col relative overflow-hidden">
-
-                    <div className="max-w-xl mx-auto w-full pt-12 relative z-10">
-                        <h2 className="text-[34px] font-medium leading-tight mb-4 text-heading">
-                            Create your forms<br />
-                            <span className="text-primary  dark:text-blue-500">Get results in minutes</span>
+                    <div className="max-w-xl mx-auto w-full pt-12 relative z-10 flex flex-col h-full">
+                        <h2 className="text-[34px] font-heading leading-tight mb-4 text-heading">
+                            Launch forms in  <span className="text-primary">seconds</span>
 
                         </h2>
-                        <p className="text-foreground text-[14px] leading-relaxed mb-12">
-                            makemyform.in is a great tool to get started with your forms. Build your forms in minutes and connect them to your favorite apps.
+                        <p className="text-foreground text-[14px] leading-relaxed mb-8">
+                            Experience the fastest way to build engaging forms, surveys, and quizzes. No coding required—just drag, drop, and publish.
                         </p>
 
-                        {/* Form Builder Mock UI */}
-                        <div className="relative w-full aspect-4/3 mt-8">
-                            <div className="absolute inset-0 bg-background rounded-2xl shadow-2xl overflow-hidden border border-border">
-                                {/* Form Builder Header */}
-                                <div className="h-14 border-b border-border flex items-center justify-between px-6 bg-card">
-                                    <div className="flex gap-10 text-[11px] font-medium text-foreground-muted">
-                                        <div className="flex flex-col items-center gap-1.5 text-primary relative cursor-pointer">
-                                            <div className="w-3.5 h-3.5 bg-primary/10 rounded-[3px]"></div>
-                                            Build
-                                        </div>
-
-                                        <div className="flex flex-col items-center gap-1.5 cursor-pointer">
-                                            <div className="w-3.5 h-3.5 bg-foreground-muted/20 rounded-[3px]"></div>
-                                            Share
-                                        </div>
-                                        <div className="flex flex-col items-center gap-1.5 cursor-pointer">
-                                            <div className="w-3.5 h-3.5 bg-foreground-muted/20 rounded-[3px]"></div>
-                                            Results
-                                        </div>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <div className="w-6 h-6 rounded-full bg-background-secondary flex items-center justify-center border border-border">
-                                            <div className="w-3 h-3 bg-foreground-muted rounded-[2px]"></div>
-                                        </div>
-                                        <div className="h-7 px-3 bg-primary text-primary-foreground text-[11px] font-medium rounded-md flex items-center justify-center">
-                                            Publish
-                                        </div>
-                                    </div>
-                                </div>
-                                {/* Form Builder Content */}
-                                <div className="flex h-full p-5 gap-5 bg-background">
-                                    {/* Sidebar mock (Field Types) */}
-                                    <div className="w-[160px] flex flex-col gap-3 bg-card p-3 rounded-xl border border-border shadow-sm h-fit">
-                                        <div className="text-[10px] font-semibold text-foreground-muted mb-1">Basic Fields</div>
-                                        {[
-                                            { icon: 'T', name: 'Short Text' },
-                                            { icon: '≡', name: 'Long Text' },
-
-                                            { icon: '▼', name: 'Dropdown' },
-                                            { name: 'More..' },
-                                        ].map((field, i) => (
-                                            <div key={i} className="flex items-center gap-2.5 p-1.5 rounded-md hover:bg-background-secondary cursor-pointer">
-                                                <div className="w-5 h-5 bg-background-secondary text-foreground-muted text-[10px] font-bold rounded flex items-center justify-center">
-                                                    {field.icon}
-                                                </div>
-                                                <div className="text-[10px] text-foreground font-medium">{field.name}</div>
-                                            </div>
-                                        ))}
-                                    </div>
-
-                                    {/* Form Canvas mock */}
-                                    <div className="flex-1 flex flex-col gap-4 mx-auto">
-                                        {/* Form Title */}
-                                        <div className="bg-card p-4 rounded-xl border border-border hover:border-primary shadow-sm">
-                                            <div className="w-3/4 h-5 bg-background-secondary rounded mb-2"></div>
-                                            <div className="w-full h-2.5 bg-background-secondary rounded"></div>
-                                        </div>
-
-
-
-                                        {/* Form Field 2 (Active/Selected) */}
-                                        <div className="bg-card p-4 rounded-xl shadow-sm border border-primary relative">
-                                            {/* Selection Handle */}
-                                            <div className="absolute -left-2 top-1/2 -translate-y-1/2 w-1 h-8 bg-primary rounded-r-md"></div>
-                                            <div className="w-1/2 h-3.5 bg-primary/80 rounded mb-3"></div>
-                                            <div className="flex flex-col gap-2">
-                                                <div className="flex items-center gap-2">
-                                                    <div className="w-3 h-3 rounded-full border-2 border-foreground-muted"></div>
-                                                    <div className="w-1/2 h-2.5 bg-background-secondary rounded"></div>
-                                                </div>
-                                                <div className="flex items-center gap-2">
-                                                    <div className="w-3 h-3 rounded-full border-2 border-primary flex items-center justify-center">
-                                                        <div className="w-1.5 h-1.5 bg-primary rounded-full"></div>
-                                                    </div>
-                                                    <div className="w-2/3 h-2.5 bg-background-secondary rounded"></div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        {/* Add Field Button */}
-                                        <div className="w-full h-10 border-2 border-dashed border-border hover:border-border-hover rounded-xl flex items-center justify-center text-foreground-muted cursor-pointer transition-colors">
-                                            <div className="w-4 h-4 rounded-full bg-background-secondary flex items-center justify-center text-lg leading-none pb-0.5">+</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Floating Integration Badge */}
-                            <div className="absolute -bottom-12 -right-12 bg-card text-foreground p-5 rounded-2xl shadow-[0_20px_40px_rgba(0,0,0,0.1)] z-20 w-[180px] border border-border">
-                                <span className="font-semibold text-[13px] block text-center mb-3">Easy to Build</span>
-                                <div className="flex justify-center items-center h-16 relative">
-                                    {/* Abstract build icons */}
-                                    <div className="w-10 h-10 bg-primary/20 rounded-full absolute left-4 bottom-2 flex items-center justify-center">
-                                        <div className="w-4 h-1 bg-primary rounded-full"></div>
-                                    </div>
-                                    <div className="w-12 h-12 bg-primary rounded-xl absolute right-5 top-1 shadow-lg flex flex-col items-center justify-center gap-1.5">
-                                        <div className="w-5 h-1.5 bg-primary-foreground/80 rounded-full"></div>
-                                        <div className="w-7 h-1.5 bg-primary-foreground/40 rounded-full"></div>
-                                    </div>
-                                </div>
-                            </div>
+                        <div className="relative w-full flex-1 min-h-[400px]">
+                            <RiveComponent className="w-full h-full absolute inset-0" />
                         </div>
                     </div>
                 </div>

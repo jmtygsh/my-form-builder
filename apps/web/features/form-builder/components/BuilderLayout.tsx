@@ -145,7 +145,7 @@ export const BuilderLayout = () => {
 
           {/* Center Canvas */}
           <ResizablePanel defaultSize={60} className="bg-muted/30">
-            <div className="h-full overflow-y-auto custom-scrollbar" onClick={(e) => e.stopPropagation()}>
+            <div className="h-full overflow-y-auto [&::-webkit-scrollbar]:w-0 [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full" onClick={(e) => e.stopPropagation()}>
               <FormRenderer />
             </div>
           </ResizablePanel>

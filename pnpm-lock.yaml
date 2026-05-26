@@ -181,6 +181,9 @@ importers:
       '@repo/trpc':
         specifier: workspace:*
         version: link:../../packages/trpc
+      '@rive-app/react-canvas':
+        specifier: ^4.28.6
+        version: 4.28.6(react@19.2.0)
       '@t3-oss/env-nextjs':
         specifier: ^0.13.10
         version: 0.13.10(typescript@5.9.2)(zod@4.3.5)
@@ -220,9 +223,6 @@ importers:
       next:
         specifier: 16.1.0
         version: 16.1.0(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
-      next-themes:
-        specifier: ^0.4.6
-        version: 0.4.6(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       postcss:
         specifier: ^8.5.6
         version: 8.5.6
@@ -2060,6 +2060,14 @@ packages:
 
   '@radix-ui/rect@1.1.1':
     resolution: {integrity: sha512-HPwpGIzkl28mWyZqG52jiqDJ12waP11Pa1lGoiyUkIEuMLBP0oeK/C89esbXrxsky5we7dfd8U58nm0SgAWpVw==}
+
+  '@rive-app/canvas@2.37.8':
+    resolution: {integrity: sha512-nffrPG+VkBKHAxZdcqYlP5M+n/mOAoagj774HH397UPTsfC27gwQURg64i6dX7WswMc5qIVX0rzCrZ86Wb2HOA==}
+
+  '@rive-app/react-canvas@4.28.6':
+    resolution: {integrity: sha512-tMEb7uDr+xuPny4HRVnkfGDHgTCkTFn15u7GHj12hC94N59g/dO15TiGr9312GVTO82FulOymOKy6sgxZyi5rw==}
+    peerDependencies:
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0
 
   '@rollup/rollup-android-arm-eabi@4.54.0':
     resolution: {integrity: sha512-OywsdRHrFvCdvsewAInDKCNyR3laPA2mc9bRYJ6LBp5IyvF3fvXbbNR0bSzHlZVFtn6E0xw2oZlyjg4rKCVcng==}
@@ -3917,12 +3925,6 @@ packages:
   negotiator@1.0.0:
     resolution: {integrity: sha512-8Ofs/AUQh8MaEcrlq5xOX0CQ9ypTF5dl78mjlMNfOK08fzpgTHQRQPBxcPlEtIw0yRpws+Zo/3r+5WRby7u3Gg==}
     engines: {node: '>= 0.6'}
-
-  next-themes@0.4.6:
-    resolution: {integrity: sha512-pZvgD5L0IEvX5/9GWyHMf3m8BKiVQwsCMHfoFosXtXBMnaS0ZnIJ9ST4b4NqLVKDEm8QBxoNNGNaBv2JNF6XNA==}
-    peerDependencies:
-      react: ^16.8 || ^17 || ^18 || ^19 || ^19.0.0-rc
-      react-dom: ^16.8 || ^17 || ^18 || ^19 || ^19.0.0-rc
 
   next@16.1.0:
     resolution: {integrity: sha512-Y+KbmDbefYtHDDQKLNrmzE/YYzG2msqo2VXhzh5yrJ54tx/6TmGdkR5+kP9ma7i7LwZpZMfoY3m/AoPPPKxtVw==}
@@ -6211,6 +6213,13 @@ snapshots:
 
   '@radix-ui/rect@1.1.1': {}
 
+  '@rive-app/canvas@2.37.8': {}
+
+  '@rive-app/react-canvas@4.28.6(react@19.2.0)':
+    dependencies:
+      '@rive-app/canvas': 2.37.8
+      react: 19.2.0
+
   '@rollup/rollup-android-arm-eabi@4.54.0':
     optional: true
 
@@ -8116,11 +8125,6 @@ snapshots:
   natural-compare@1.4.0: {}
 
   negotiator@1.0.0: {}
-
-  next-themes@0.4.6(react-dom@19.2.0(react@19.2.0))(react@19.2.0):
-    dependencies:
-      react: 19.2.0
-      react-dom: 19.2.0(react@19.2.0)
 
   next@16.1.0(react-dom@19.2.0(react@19.2.0))(react@19.2.0):
     dependencies:

@@ -19,9 +19,9 @@
   --heading: oklch(0.1 0 0);
 
   /* Accents & Primary */
-  --primary: oklch(0.488 0.243 264.376);
-  --primary-hover: oklch(0.42 0.243 264.376);
-  --primary-foreground: oklch(0.979 0.021 166.113);
+  --primary: #5ccdb1;
+  --primary-hover: #4ab99d;
+  --primary-foreground: #000000;
 
   --secondary: oklch(0.967 0.001 286.375);
   --secondary-foreground: oklch(0.21 0.006 285.885);
@@ -84,9 +84,9 @@
   --heading: oklch(1 0 0);
 
   /* Accents & Primary */
-  --primary: oklch(0.424 0.199 265.638);
-  --primary-hover: oklch(0.5 0.199 265.638);
-  --primary-foreground: oklch(0.97 0.014 254.604);
+  --primary: #5ccdb1;
+  --primary-hover: #4ab99d;
+  --primary-foreground: #000000;
 
   --secondary: oklch(0.274 0.006 286.033);
   --secondary-foreground: oklch(0.985 0 0);
@@ -137,6 +137,9 @@
   --color-foreground-muted: var(--foreground-muted);
   --color-foreground-placeholder: var(--foreground-placeholder);
   --color-heading: var(--heading);
+  --font-sans: var(--font-helvetica), ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-editorial), ui-serif, Georgia, serif;
+  --font-script: var(--font-la-belle), cursive;
   --font-mono: var(--font-geist-mono);
 
   --color-sidebar-ring: var(--sidebar-ring);

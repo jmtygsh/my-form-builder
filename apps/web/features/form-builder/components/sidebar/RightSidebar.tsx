@@ -285,7 +285,7 @@ export const RightSidebar = () => {
 
   if (selectedCanvas) {
     return (
-      <div className="bg-muted/10 p-4 flex flex-col gap-4 h-full overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full border-l">
+      <div className="bg-muted/10 p-4 flex flex-col gap-4 h-full overflow-y-auto [&::-webkit-scrollbar]:w-0 [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full border-l">
         <div className="flex justify-between items-center">
           <h2 className="font-semibold text-xs text-muted-foreground uppercase tracking-wider shrink-0">
             Configuration
@@ -295,7 +295,7 @@ export const RightSidebar = () => {
           </h3>
         </div>
 
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full">
           <CanvasSettings
             form={form}
             updateFormProps={updateFormProps}
@@ -319,7 +319,7 @@ export const RightSidebar = () => {
             </h3>
           </div>
 
-          <div className="flex-1 overflow-y-auto">
+          <div className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full">
             <RowSettings
               row={selectedRow}
               updateRow={(updates) => updateRow(selectedRow.id, updates)}
@@ -347,39 +347,37 @@ export const RightSidebar = () => {
             Configuration
           </h2>
         </div>
-        <div className="flex-1 flex flex-col items-center justify-center text-center text-muted-foreground text-sm p-4">
-          Select an element on the canvas to configure its settings.
+        <div className="flex-1 flex items-center justify-center text-sm text-muted-foreground border-2 border-dashed border-border/50 rounded-lg bg-background/50">
+          Select a field to configure
         </div>
       </div>
     );
   }
 
   const registryItem = FieldRegistry[selectedField.type];
-  if (!registryItem) return null;
-
-  const SettingsComponent = registryItem.settingsComponent;
+  const SettingsComponent = registryItem?.settingsComponent;
 
   return (
     <div className="bg-muted/10 p-4 flex flex-col gap-4 h-full overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full border-l">
-      <div className="flex justify-between items-center">
-        <h2 className="font-semibold text-xs text-muted-foreground uppercase tracking-wider shrink-0">
+      <div className="shrink-0">
+        <h2 className="font-semibold text-xs text-muted-foreground mb-1 uppercase tracking-wider shrink-0">
           Configuration
         </h2>
-        <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-          ({registryItem.label})
-        </h3>
+        <div className="text-xs text-muted-foreground truncate">
+          Editing <span className="font-medium text-foreground">{registryItem?.label}</span>
+        </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto">
-
-        <SettingsComponent
-          field={selectedField}
-          updateField={(updates) => updateField(selectedField.id, updates)}
-        />
-
+      <div className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full pb-12">
+        {SettingsComponent && (
+          <SettingsComponent
+            field={selectedField}
+            updateField={(updates) => updateField(selectedField!.id, updates)}
+          />
+        )}
         <StyleSettings
           field={selectedField}
-          updateField={(updates) => updateField(selectedField.id, updates)}
+          updateField={(updates) => updateField(selectedField!.id, updates)}
         />
       </div>
     </div>

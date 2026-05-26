@@ -16,6 +16,8 @@ const buttonVariants = cva(
           "border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50",
         secondary:
           "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        textured:
+          "relative px-10! border-2 border-black bg-primary text-primary-foreground hover:cursor-pointer rounded-full after:absolute after:inset-0 after:z-[-1] after:translate-x-[5px] after:translate-y-[5px] after:rounded-full after:border-2 after:border-black after:bg-[url('/assets/texture.png')] after:bg-repeat hover:after:translate-x-0 hover:after:translate-y-0 transition-transform ",
         ghost:
           "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
         link: "text-primary underline-offset-4 hover:underline",
