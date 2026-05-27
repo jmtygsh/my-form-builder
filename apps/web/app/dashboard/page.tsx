@@ -31,9 +31,10 @@ export default function DashboardPage() {
     const handleLogout = async () => {
         try {
             await logoutAsync();
-            router.push("/login");
         } catch (error) {
             console.error("Logout failed:", error);
+        } finally {
+            window.location.href = "/login";
         }
     };
 
