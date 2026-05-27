@@ -26,12 +26,7 @@ service request form
 
 
 
-<!-- db pass -->
-z5gWQxTnrRRNVwZW
 
-
-<!--  resend api key -->
-re_JWACr8dd_FBQVavVDLWaShmgYAfC2m3fh
 
 
 
