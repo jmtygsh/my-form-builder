@@ -64,8 +64,10 @@ export type getFormDisplayListInputType = z.infer<typeof getFormDisplayListInput
 // form draft common 
 export const formDraftSchema = z.object({
   name: z.string(),
+  props: z.record(z.string(), z.any()).optional(),
   rows: z.array(z.object({
     id: z.string(),
+    props: z.record(z.string(), z.any()).optional(),
     fields: z.array(z.object({
       id: z.string(),
       type: z.string(),
@@ -118,9 +120,15 @@ export type verifyFormPasswordInputType = z.infer<typeof verifyFormPasswordInput
 
 export const submitFormResponseInput = z.object({
   formId: z.string().describe("uuid of the form"),
-  answers: z.record(z.string(), z.any()).describe("answers submitted by the respondent"),
+  answers: z.record(z.string(), z.union([z.string(), z.array(z.string())])).describe("answers submitted by the respondent"),
 });
 export type submitFormResponseInputType = z.infer<typeof submitFormResponseInput>;
+
+export const getFormResponsesInput = z.object({
+  formId: z.string().describe("uuid of the form"),
+  userId: z.string().describe("uuid of the user"),
+});
+export type getFormResponsesInputType = z.infer<typeof getFormResponsesInput>;
 
 //end form draft common 
 

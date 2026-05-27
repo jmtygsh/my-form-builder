@@ -1,6 +1,6 @@
 import { randomBytes, createHmac } from "node:crypto";
 import * as JWT from "jsonwebtoken";
-import { and, db, eq } from "@repo/database";
+import { and, count, db, eq } from "@repo/database";
 
 import { passwordResetTokensTable, usersTable } from "@repo/database/models/user";
 import {
@@ -32,6 +32,8 @@ import {
   verifyFormPasswordInputType,
   submitFormResponseInput,
   submitFormResponseInputType,
+  getFormResponsesInput,
+  getFormResponsesInputType,
 } from "./model";
 
 import { displayFormsTable, formResponsesTable, formTableConfiguration } from "@repo/database/models/form";
@@ -295,12 +297,99 @@ class UserService {
     const user = await this.getUserById(userId);
     if (!user) throw new Error(`User does not exist`);
 
-    // fetch forms for the user
-    const forms = await db.select().from(displayFormsTable).where(eq(displayFormsTable.userId, userId));
+    // fetch forms for the user with response counts
+    const forms = await db.select({
+      id: displayFormsTable.id,
+      title: displayFormsTable.title,
+      description: displayFormsTable.description,
+      slug: displayFormsTable.slug,
+      createdAt: displayFormsTable.createdAt,
+      responsesCount: count(formResponsesTable.id),
+    })
+      .from(displayFormsTable)
+      .leftJoin(formResponsesTable, eq(displayFormsTable.id, formResponsesTable.formId))
+      .where(
+        and(
+          eq(displayFormsTable.userId, userId),
+          eq(displayFormsTable.isDeleted, false)
+        )
+      )
+      .groupBy(displayFormsTable.id);
 
     if (!forms) throw new Error(`User does not have any form`);
 
     return forms;
+  }
+
+  // get trashed forms
+  public async getTrashedForms(payload: { userId: string }) {
+    const { userId } = payload;
+    const user = await this.getUserById(userId);
+    if (!user) throw new Error(`User does not exist`);
+
+    const forms = await db.select({
+      id: displayFormsTable.id,
+      title: displayFormsTable.title,
+      description: displayFormsTable.description,
+      slug: displayFormsTable.slug,
+      createdAt: displayFormsTable.createdAt,
+    })
+      .from(displayFormsTable)
+      .where(
+        and(
+          eq(displayFormsTable.userId, userId),
+          eq(displayFormsTable.isDeleted, true)
+        )
+      );
+
+    return forms;
+  }
+
+  // soft delete form (move to trash)
+  public async softDeleteForm(payload: { formId: string, userId: string }) {
+    const { formId, userId } = payload;
+    const result = await db.update(displayFormsTable)
+      .set({ isDeleted: true })
+      .where(
+        and(
+          eq(displayFormsTable.id, formId),
+          eq(displayFormsTable.userId, userId)
+        )
+      ).returning({ id: displayFormsTable.id });
+
+    if (!result[0]) throw new Error("Failed to delete form or permission denied");
+    return result[0];
+  }
+
+  // restore form from trash
+  public async restoreForm(payload: { formId: string, userId: string }) {
+    const { formId, userId } = payload;
+    const result = await db.update(displayFormsTable)
+      .set({ isDeleted: false })
+      .where(
+        and(
+          eq(displayFormsTable.id, formId),
+          eq(displayFormsTable.userId, userId)
+        )
+      ).returning({ id: displayFormsTable.id });
+
+    if (!result[0]) throw new Error("Failed to restore form or permission denied");
+    return result[0];
+  }
+
+  // hard delete form permanently
+  public async hardDeleteForm(payload: { formId: string, userId: string }) {
+    const { formId, userId } = payload;
+    const result = await db.delete(displayFormsTable)
+      .where(
+        and(
+          eq(displayFormsTable.id, formId),
+          eq(displayFormsTable.userId, userId)
+        )
+      ).returning({ id: displayFormsTable.id });
+
+    if (!result[0]) throw new Error("Failed to delete form or permission denied");
+    return result[0];
   }
 
 
@@ -333,14 +422,25 @@ class UserService {
     const form = await db
       .select({
         draft: displayFormsTable.draft,
+        published: displayFormsTable.published,
       })
       .from(displayFormsTable)
       .where(eq(displayFormsTable.id, formId));
 
     if (!form[0] || form.length === 0) throw new Error("Data does not exist");
 
+    // Smart merge: Compare draft and published lengths to determine which one has more data
+    const draftPayload = form[0].draft;
+    const publishedPayload = form[0].published;
+
+    const draftLength = draftPayload && Array.isArray(draftPayload.rows) ? draftPayload.rows.length : 0;
+    const publishedLength = publishedPayload && Array.isArray(publishedPayload.rows) ? publishedPayload.rows.length : 0;
+
+    // If published has more rows, we return that as the source of truth to avoid losing data
+    const targetPayload = publishedLength > draftLength ? publishedPayload : draftPayload;
+
     return {
-      draft: form[0].draft
+      draft: targetPayload
     };
   }
 
@@ -521,6 +621,37 @@ class UserService {
     if (!response[0]) throw new Error("Failed to submit response");
 
     return { id: response[0].id };
+  }
+
+  // get form responses
+  public async getFormResponses(payload: getFormResponsesInputType) {
+    const { formId, userId } = await getFormResponsesInput.parseAsync(payload);
+
+    // Verify ownership
+    const form = await db
+      .select({
+        id: displayFormsTable.id,
+        published: displayFormsTable.published,
+      })
+      .from(displayFormsTable)
+      .where(
+        and(
+          eq(displayFormsTable.id, formId),
+          eq(displayFormsTable.userId, userId)
+        )
+      );
+
+    if (!form[0]) throw new Error("Form does not exist or you do not have permission");
+
+    const responses = await db
+      .select()
+      .from(formResponsesTable)
+      .where(eq(formResponsesTable.formId, formId));
+
+    return {
+      published: form[0].published,
+      responses,
+    };
   }
 }
 

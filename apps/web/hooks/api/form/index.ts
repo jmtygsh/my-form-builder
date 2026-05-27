@@ -182,5 +182,87 @@ export const useSubmitFormResponse = () => {
     };
 };
 
+export const useGetFormResponses = (formId: string) => {
+    const { data, error, isFetched, isFetching, isLoading, status } = trpc.form.getFormResponses.useQuery(
+        { formId },
+        { enabled: !!formId }
+    );
+
+    return {
+        published: data?.published,
+        responses: data?.responses,
+        error,
+        isFetched,
+        isFetching,
+        isLoading,
+        status
+    };
+};
+
+export const useGetTrashedForms = () => {
+    const { data: trashedForms, error, isFetched, isFetching, isLoading, status } = trpc.form.getTrashedForms.useQuery(undefined);
+    return {
+        trashedForms,
+        error,
+        isFetched,
+        isFetching,
+        isLoading,
+        status
+    };
+};
+
+export const useSoftDeleteForm = () => {
+    const utils = trpc.useUtils();
+
+    const {
+        mutateAsync: softDeleteFormAsync,
+        mutate: softDeleteForm,
+        error,
+        isPending
+    } = trpc.form.softDeleteForm.useMutation({
+        onSuccess: () => {
+            utils.form.getFormDisplayList.invalidate();
+            utils.form.getTrashedForms.invalidate();
+        }
+    });
+
+    return { softDeleteFormAsync, softDeleteForm, error, isPending };
+};
+
+export const useRestoreForm = () => {
+    const utils = trpc.useUtils();
+
+    const {
+        mutateAsync: restoreFormAsync,
+        mutate: restoreForm,
+        error,
+        isPending
+    } = trpc.form.restoreForm.useMutation({
+        onSuccess: () => {
+            utils.form.getFormDisplayList.invalidate();
+            utils.form.getTrashedForms.invalidate();
+        }
+    });
+
+    return { restoreFormAsync, restoreForm, error, isPending };
+};
+
+export const useHardDeleteForm = () => {
+    const utils = trpc.useUtils();
+
+    const {
+        mutateAsync: hardDeleteFormAsync,
+        mutate: hardDeleteForm,
+        error,
+        isPending
+    } = trpc.form.hardDeleteForm.useMutation({
+        onSuccess: () => {
+            utils.form.getTrashedForms.invalidate();
+        }
+    });
+
+    return { hardDeleteFormAsync, hardDeleteForm, error, isPending };
+};
+
 
 

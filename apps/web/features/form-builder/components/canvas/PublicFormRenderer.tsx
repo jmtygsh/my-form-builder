@@ -40,16 +40,9 @@ export const PublicFormRenderer = ({ form }: PublicFormRendererProps) => {
     "16": "p-16",
   }[form.props?.padding || "8"];
 
-  const canvasStyle = {
-    backgroundColor: form.props?.backgroundColor || undefined,
-  };
-
   return (
-    <div
-      className={cn("mx-auto pb-24 transition-all duration-200", maxWidthClass, paddingClass)}
-      style={canvasStyle}
-    >
-      <div className="space-y-4 border p-4 rounded-md bg-card overflow-hidden">
+    <div className={cn("mx-auto transition-all duration-200", maxWidthClass, paddingClass)}>
+      <div className="space-y-4 border p-4 rounded-md bg-card overflow-hidden shadow-sm">
         {form.props?.showCoverImage && form.props?.coverImageUrl && (
           <div className="-mx-4 -mt-4 mb-6">
             {/* eslint-disable-next-line @next/next/no-img-element */}

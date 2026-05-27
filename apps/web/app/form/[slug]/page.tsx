@@ -34,8 +34,8 @@ export default function PublicFormPage() {
             const res = await verifyFormPasswordAsync({ slug, password });
             setUnlockedFormPayload(res.published);
             toast.success("Form unlocked!");
-        } catch (err: any) {
-            toast.error(err.message || "Incorrect password");
+        } catch (err) {
+            toast.error(err instanceof Error ? err.message : "Incorrect password");
         }
     };
 
@@ -46,10 +46,12 @@ export default function PublicFormPage() {
         const formData = new FormData(e.currentTarget);
 
 
-        const answers: Record<string, any> = {};
+        const answers: Record<string, string | string[]> = {};
         for (const key of Array.from(formData.keys())) {
             const values = formData.getAll(key);
-            answers[key] = values.length > 1 ? values : values[0];
+            answers[key] = values.length > 1
+                ? values.map(v => String(v))
+                : String(values[0]);
         }
 
         try {
@@ -59,8 +61,8 @@ export default function PublicFormPage() {
             });
             setIsSubmitted(true);
             toast.success("Response submitted successfully!");
-        } catch (err: any) {
-            toast.error(err.message || "Failed to submit response");
+        } catch (err) {
+            toast.error(err instanceof Error ? err.message : "Failed to submit response");
         }
     };
 
@@ -137,9 +139,12 @@ export default function PublicFormPage() {
         return null;
     }
 
+    // We extract the background color here to apply it to the full viewport
+    const backgroundColor = unlockedFormPayload.props?.backgroundColor || undefined;
+
     return (
-        <div className="min-h-screen bg-background py-12">
-            <form onSubmit={handleFormSubmit} className="mx-auto max-w-5xl px-4">
+        <div className="min-h-screen py-12" style={{ backgroundColor }}>
+            <form onSubmit={handleFormSubmit}>
                 <PublicFormRenderer form={unlockedFormPayload} />
             </form>
         </div>

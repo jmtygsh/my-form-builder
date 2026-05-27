@@ -58,10 +58,12 @@ export default function Home() {
 
 
           <div className="mt-8 flex justify-center">
-            <Button variant="textured" className="h-12 px-8 text-base">
-              Create your form
-              <MoveRight className="ml-2 size-5" />
-            </Button>
+            <Link href="/dashboard">
+              <Button variant="textured" className="h-12 px-8 text-base">
+                Create your form
+                <MoveRight className="ml-2 size-5" />
+              </Button>
+            </Link>
           </div>
 
         </div>

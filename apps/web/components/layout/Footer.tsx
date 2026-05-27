@@ -128,7 +128,7 @@ export const Footer = () => {
 
                 {/* Bottom Bar */}
                 <div className="pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-black font-medium">
-                    <p>Copyright © 2024, mmf.</p>
+                    <p>Copyright © 2026, mmf.</p>
                     <div className="flex flex-wrap justify-center gap-4 gap-y-2">
                         <span>All Rights Reserved.</span>
                         <Link href="#" className="underline underline-offset-4 hover:opacity-70">Terms of Use</Link>

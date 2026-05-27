@@ -12,6 +12,9 @@ https://www.jotform.com/form-templates/client-onboarding-form
 
 -----------
 
+
+
+
 Customer feedback form,
 event registration form,
 vendor registration form,
@@ -23,11 +26,6 @@ Course enrollment form,
 appointment scheduling form,
 travel booking form,
 service request form
-
-
-
-
-
 
 
 

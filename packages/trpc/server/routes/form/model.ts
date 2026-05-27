@@ -19,6 +19,8 @@ export const getFormDisplayListOutputModel = z.array(z.object({
     title: z.string(),
     description: z.string().nullable(),
     slug: z.string(),
+    responsesCount: z.coerce.number().default(0),
+    createdAt: z.date().optional(),
 }));
 
 
@@ -26,8 +28,10 @@ export const getFormDisplayListOutputModel = z.array(z.object({
 // common type for input & output
 export const formDraftSchema = z.object({
     name: z.string(),
+    props: z.record(z.string(), z.any()).optional(),
     rows: z.array(z.object({
         id: z.string(),
+        props: z.record(z.string(), z.any()).optional(),
         fields: z.array(z.object({
             id: z.string(),
             type: z.string(),
@@ -99,11 +103,41 @@ export const verifyFormPasswordOutputModel = z.object({
 
 export const submitFormResponseInputModel = z.object({
     formId: z.string().describe("uuid of the form"),
-    answers: z.record(z.string(), z.any()).describe("answers submitted by the respondent"),
+    answers: z.record(z.string(), z.union([z.string(), z.array(z.string())])).describe("answers submitted by the respondent"),
 });
 
 export const submitFormResponseOutputModel = z.object({
     id: z.string(),
 });
+
+export const getFormResponsesInputModel = z.object({
+    formId: z.string().describe("uuid of the form")
+});
+
+export const getFormResponsesOutputModel = z.object({
+    published: formDraftSchema.nullable(),
+    responses: z.array(z.object({
+        id: z.string(),
+        answers: z.any(),
+        respondentId: z.string(),
+        createdAt: z.date(),
+    }))
+});
+
+export const deleteFormInputModel = z.object({
+    formId: z.string().uuid()
+});
+
+export const deleteFormOutputModel = z.object({
+    id: z.string().uuid()
+});
+
+export const getTrashedFormsOutputModel = z.array(z.object({
+    id: z.string(),
+    title: z.string(),
+    description: z.string().nullable(),
+    slug: z.string(),
+    createdAt: z.date(),
+}));
 
 

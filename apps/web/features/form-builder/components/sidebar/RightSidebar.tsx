@@ -13,10 +13,24 @@ import { Field, Row, FormSchema } from "../../types";
 import { UnsplashPicker } from "~/components/ui/unsplash-picker";
 import { Button } from "~/components/ui/button";
 
-const CanvasSettings = ({ form, updateFormProps }: { form: FormSchema; updateFormProps: (updates: Partial<FormSchema["props"]>) => void }) => {
+const CanvasSettings = ({ form, updateFormProps, setFormTitle }: { form: FormSchema; updateFormProps: (updates: Partial<FormSchema["props"]>) => void, setFormTitle: (title: string) => void }) => {
   return (
     <div className="flex flex-col gap-6 pt-2">
       <div className="space-y-4">
+        <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Canvas Settings</h4>
+
+        <div className="space-y-1.5">
+          <Label className="text-xs font-medium text-muted-foreground">Form Name</Label>
+          <Input
+            value={form.name}
+            onChange={(e) => setFormTitle(e.target.value)}
+            placeholder="e.g. Untitled Form"
+            className="h-8 text-sm"
+          />
+          <p className="text-[10px] text-muted-foreground pt-1">Internal name for identifying the form.</p>
+        </div>
+
+        <div className="h-px bg-border w-full my-2" />
         <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Canvas Layout</h4>
 
         <div className="space-y-1.5">
@@ -281,7 +295,7 @@ const StyleSettings = ({ field, updateField }: { field: Field; updateField: (upd
 };
 
 export const RightSidebar = () => {
-  const { form, selectedFieldId, selectedRowId, selectedCanvas, updateField, updateRow, updateFormProps } = useBuilderStore();
+  const { form, selectedFieldId, selectedRowId, selectedCanvas, updateField, updateRow, updateFormProps, setFormTitle } = useBuilderStore();
 
   if (selectedCanvas) {
     return (
@@ -299,6 +313,7 @@ export const RightSidebar = () => {
           <CanvasSettings
             form={form}
             updateFormProps={updateFormProps}
+            setFormTitle={setFormTitle}
           />
         </div>
       </div>

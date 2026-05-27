@@ -18,8 +18,10 @@ export const visibilityEnum = pgEnum("visibility", ["public", "unlisted", "unpub
 // --- Shared Types & Constants ---
 export type FormPayload = {
     name: string;
+    props?: Record<string, any>;
     rows: {
         id: string;
+        props?: Record<string, any>;
         fields: {
             id: string;
             type: string;
@@ -47,6 +49,8 @@ export const displayFormsTable = pgTable("display_forms", {
     draft: jsonb("draft").$type<FormPayload>().default(defaultFormPayload),
 
     published: jsonb("published").$type<FormPayload>().default(defaultFormPayload),
+
+    isDeleted: boolean("is_deleted").default(false).notNull(),
 
     // Timestamps for audit trails
     createdAt: timestamp("created_at").defaultNow().notNull(),

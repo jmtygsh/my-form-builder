@@ -1,0 +1,1 @@
+ALTER TABLE "display_forms" ADD COLUMN "is_deleted" boolean DEFAULT false NOT NULL;

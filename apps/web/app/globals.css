@@ -39,9 +39,9 @@
 
   /* Borders & States */
   --border: oklch(0.922 0 0);
-  --border-hover: oklch(0.85 0 0);
+  --border-hover: var(--primary);
   --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
+  --ring: var(--primary);
 
   /* Status */
   --destructive: oklch(0.577 0.245 27.325);
@@ -104,9 +104,9 @@
 
   /* Borders & States */
   --border: lab(100% 0 0 / 0.3);
-  --border-hover: oklch(1 0 0 / 20%);
+  --border-hover: var(--primary);
   --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
+  --ring: var(--primary);
 
   /* Status */
   --destructive: oklch(0.704 0.191 22.216);
