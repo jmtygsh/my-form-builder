@@ -93,6 +93,15 @@ export type loadDraftedFormInputType = z.infer<typeof loadDraftedFormInput>;
 export const publishFormInput = z.object({
   formId: z.string().describe("uuid of the form"),
   data: formDraftSchema.describe("json representation of the publish state"),
+  settings: z.object({
+    visibility: z.enum(["public", "unlisted", "unpublished"]),
+    protected: z.boolean(),
+    password: z.string().optional(),
+    expiryEnabled: z.boolean(),
+    expiryDate: z.string().optional(),
+    allowAnonymous: z.boolean(),
+    maxResponses: z.string().optional(),
+  }).describe("publish settings for the form"),
 })
 export type publishFormInputType = z.infer<typeof publishFormInput>;
 
@@ -100,6 +109,12 @@ export const getFormBySlugInput = z.object({
   slug: z.string().describe("slug of the form")
 });
 export type getFormBySlugInputType = z.infer<typeof getFormBySlugInput>;
+
+export const verifyFormPasswordInput = z.object({
+  slug: z.string().describe("slug of the form"),
+  password: z.string().describe("password to unlock the form")
+});
+export type verifyFormPasswordInputType = z.infer<typeof verifyFormPasswordInput>;
 
 export const submitFormResponseInput = z.object({
   formId: z.string().describe("uuid of the form"),

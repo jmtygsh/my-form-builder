@@ -121,7 +121,7 @@ export const usePublishForm = () => {
 export const useGetFormBySlug = (slug: string) => {
     const { data, error, isFetched, isFetching, isLoading, status } = trpc.form.getFormBySlug.useQuery(
         { slug },
-        { enabled: !!slug }
+        { enabled: !!slug, retry: false }
     );
 
     return {
@@ -131,6 +131,30 @@ export const useGetFormBySlug = (slug: string) => {
         isFetching,
         isLoading,
         status
+    };
+};
+
+export const useVerifyFormPassword = () => {
+    const {
+        mutateAsync: verifyFormPasswordAsync,
+        mutate: verifyFormPassword,
+        error,
+        isError,
+        isIdle,
+        isSuccess,
+        status,
+        isPending
+    } = trpc.form.verifyFormPassword.useMutation();
+
+    return {
+        verifyFormPasswordAsync,
+        verifyFormPassword,
+        error,
+        isError,
+        isIdle,
+        isSuccess,
+        status,
+        isPending
     };
 };
 

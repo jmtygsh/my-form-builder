@@ -60,6 +60,15 @@ export const loadDraftedFormOutputModel = z.object({
 export const publishFormInputModel = z.object({
     formId: z.string().describe("uuid of the form"),
     data: formDraftSchema.describe("json representation of the data builder state"),
+    settings: z.object({
+        visibility: z.enum(["public", "unlisted", "unpublished"]),
+        protected: z.boolean(),
+        password: z.string().optional(),
+        expiryEnabled: z.boolean(),
+        expiryDate: z.string().optional(),
+        allowAnonymous: z.boolean(),
+        maxResponses: z.string().optional(),
+    }).describe("publish settings for the form"),
 })
 
 export const publishFormOutputModel = z.object({
@@ -75,10 +84,18 @@ export const getFormBySlugOutputModel = z.object({
     id: z.string(),
     title: z.string(),
     description: z.string().nullable(),
+    isProtected: z.boolean(),
     published: formDraftSchema.nullable(),
 });
 
+export const verifyFormPasswordInputModel = z.object({
+    slug: z.string().describe("slug of the form"),
+    password: z.string().describe("password to unlock the form")
+});
 
+export const verifyFormPasswordOutputModel = z.object({
+    published: formDraftSchema.nullable(),
+});
 
 export const submitFormResponseInputModel = z.object({
     formId: z.string().describe("uuid of the form"),

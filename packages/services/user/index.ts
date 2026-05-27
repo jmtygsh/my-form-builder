@@ -28,6 +28,8 @@ import {
   loadDraftedFormInputType,
   getFormBySlugInput,
   getFormBySlugInputType,
+  verifyFormPasswordInput,
+  verifyFormPasswordInputType,
   submitFormResponseInput,
   submitFormResponseInputType,
 } from "./model";
@@ -285,8 +287,6 @@ class UserService {
 
   }
 
-
-
   // need to update i think **
   public async getFormDisplayList(payload: getFormDisplayListInputType) {
     const { userId } = await getFormDisplayListInput.parseAsync(payload);
@@ -346,7 +346,7 @@ class UserService {
 
   //call when click save
   public async publishForm(payload: publishFormInputType) {
-    const { formId, data } = await publishFormInput.parseAsync(payload);
+    const { formId, data, settings } = await publishFormInput.parseAsync(payload);
 
     // check if form exists
     const existingForm = await db
@@ -356,7 +356,41 @@ class UserService {
 
     if (!existingForm[0] || existingForm.length === 0) throw new Error("you don't created form id");
 
-    // update draft
+    const maxResponses = settings.maxResponses ? parseInt(settings.maxResponses, 10) : null;
+    const expiry = settings.expiryEnabled && settings.expiryDate ? new Date(settings.expiryDate) : null;
+
+    let hashedPassword = "";
+    if (settings.protected && settings.password) {
+      hashedPassword = await this.generateHash(formId, settings.password);
+    }
+
+    const existingConfig = await db
+      .select()
+      .from(formTableConfiguration)
+      .where(eq(formTableConfiguration.formId, formId));
+
+    if (existingConfig.length > 0) {
+      await db.update(formTableConfiguration).set({
+        visibility: settings.visibility,
+        protected: settings.protected,
+        password: hashedPassword,
+        expiry: expiry,
+        allowAnonymous: settings.allowAnonymous,
+        maxResponses: maxResponses && !isNaN(maxResponses) ? maxResponses : null,
+      }).where(eq(formTableConfiguration.formId, formId));
+    } else {
+      await db.insert(formTableConfiguration).values({
+        formId: formId,
+        visibility: settings.visibility,
+        protected: settings.protected,
+        password: hashedPassword,
+        expiry: expiry,
+        allowAnonymous: settings.allowAnonymous,
+        maxResponses: maxResponses && !isNaN(maxResponses) ? maxResponses : null,
+      });
+    }
+
+    // update draft and published form payload
     await db
       .update(displayFormsTable)
       .set({ published: data })
@@ -369,31 +403,112 @@ class UserService {
   public async getFormBySlug(payload: getFormBySlugInputType) {
     const { slug } = await getFormBySlugInput.parseAsync(payload);
 
-    const form = await db
+    const formResult = await db
       .select({
         id: displayFormsTable.id,
         title: displayFormsTable.title,
         description: displayFormsTable.description,
         published: displayFormsTable.published,
+        config: formTableConfiguration,
       })
       .from(displayFormsTable)
+      .leftJoin(formTableConfiguration, eq(displayFormsTable.id, formTableConfiguration.formId))
       .where(eq(displayFormsTable.slug, slug));
 
-    if (!form[0] || form.length === 0) throw new Error("Form does not exist");
+    const form = formResult[0];
+    if (!form) throw new Error("Form does not exist");
 
-    return form[0];
+    const config = form.config;
+    if (config) {
+      if (config.visibility === "unpublished") throw new Error("Form is not available");
+      if (config.expiry && new Date() > config.expiry) throw new Error("Form has expired");
+
+      if (config.maxResponses) {
+        const responseCountResult = await db.select({ count: formResponsesTable.id }).from(formResponsesTable).where(eq(formResponsesTable.formId, form.id));
+        if (responseCountResult.length >= config.maxResponses) {
+          throw new Error("Form has reached maximum responses");
+        }
+      }
+
+      if (config.protected) {
+        return {
+          id: form.id,
+          title: form.title,
+          description: form.description,
+          isProtected: true,
+          published: null,
+        };
+      }
+    }
+
+    return {
+      id: form.id,
+      title: form.title,
+      description: form.description,
+      isProtected: false,
+      published: form.published,
+    };
+  }
+
+  // public: verify form password
+  public async verifyFormPassword(payload: verifyFormPasswordInputType) {
+    const { slug, password } = await verifyFormPasswordInput.parseAsync(payload);
+
+    const formResult = await db
+      .select({
+        id: displayFormsTable.id,
+        published: displayFormsTable.published,
+        config: formTableConfiguration,
+      })
+      .from(displayFormsTable)
+      .leftJoin(formTableConfiguration, eq(displayFormsTable.id, formTableConfiguration.formId))
+      .where(eq(displayFormsTable.slug, slug));
+
+    const form = formResult[0];
+    if (!form) throw new Error("Form does not exist");
+
+    const config = form.config;
+    if (!config || !config.protected) {
+      return { published: form.published };
+    }
+
+    const hashedInputPassword = await this.generateHash(form.id, password);
+
+    if (config.password !== hashedInputPassword) {
+      throw new Error("Incorrect password");
+    }
+
+    return { published: form.published };
   }
 
   // public: submit form response
   public async submitFormResponse(payload: submitFormResponseInputType) {
     const { formId, answers } = await submitFormResponseInput.parseAsync(payload);
 
-    const form = await db
-      .select()
+    const formResult = await db
+      .select({
+        id: displayFormsTable.id,
+        config: formTableConfiguration,
+      })
       .from(displayFormsTable)
+      .leftJoin(formTableConfiguration, eq(displayFormsTable.id, formTableConfiguration.formId))
       .where(eq(displayFormsTable.id, formId));
 
-    if (!form[0] || form.length === 0) throw new Error("Form does not exist");
+    const form = formResult[0];
+    if (!form) throw new Error("Form does not exist");
+
+    const config = form.config;
+    if (config) {
+      if (config.visibility === "unpublished") throw new Error("Form is not available");
+      if (config.expiry && new Date() > config.expiry) throw new Error("Form has expired");
+
+      if (config.maxResponses) {
+        const responseCountResult = await db.select({ count: formResponsesTable.id }).from(formResponsesTable).where(eq(formResponsesTable.formId, form.id));
+        if (responseCountResult.length >= config.maxResponses) {
+          throw new Error("Form has reached maximum responses");
+        }
+      }
+    }
 
     const respondentId = randomBytes(16).toString("hex");
 
