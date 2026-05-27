@@ -1,9 +1,9 @@
 import { userService } from "../../services";
-import { createUserWithEmailAndPasswordInputModel, createUserWithEmailAndPasswordOutputModel, forgetPasswordInputModel, forgetPasswordOutputModel, getLoggerInUserInfoInputModel, getLoggerInUserInfoOutput, signInUserWithEmailAndPasswordInputModel, signInUserWithEmailAndPasswordOutputModel, verifyUserEmailWithTokenInputModel, verifyUserEmailWithTokenOutputModel, resetPasswordInputModel, resetPasswordOutputModel } from "./model";
+import { createUserWithEmailAndPasswordInputModel, createUserWithEmailAndPasswordOutputModel, forgetPasswordInputModel, forgetPasswordOutputModel, getLoggerInUserInfoInputModel, getLoggerInUserInfoOutput, signInUserWithEmailAndPasswordInputModel, signInUserWithEmailAndPasswordOutputModel, verifyUserEmailWithTokenInputModel, verifyUserEmailWithTokenOutputModel, resetPasswordInputModel, resetPasswordOutputModel, logoutInputModel, logoutOutputModel } from "./model";
 
 import { publicProcedure, router } from "../../trpc";
 import { generatePath } from "../../utils/path-generator";
-import { getAuthenticationCookie, setAuthenticationCookie } from "../../utils/cookie";
+import { getAuthenticationCookie, setAuthenticationCookie, clearAuthenticationCookie } from "../../utils/cookie";
 
 const TAGS = ["Authentication"];
 const getPath = generatePath("/authentication");
@@ -102,6 +102,16 @@ export const authRouter = router({
       });
       return {
         id
+      };
+    }),
+
+  logout: publicProcedure
+    .meta({ openapi: { method: "POST", path: getPath("/logout"), tags: TAGS } })
+    .output(logoutOutputModel)
+    .mutation(async ({ ctx }) => {
+      clearAuthenticationCookie(ctx);
+      return {
+        success: true
       };
     }),
 

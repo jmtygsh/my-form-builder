@@ -8,6 +8,7 @@ import { LogOut, User, Settings, Sparkles, CreditCard, FolderPlus, Plus, Trash2,
 import { Button } from "~/components/ui/button"
 import { Input } from "~/components/ui/input"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -17,13 +18,24 @@ import {
     DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu"
 import { Skeleton } from "~/components/ui/skeleton"
-import { useUser } from "~/hooks/api/auth"
+import { useUser, useLogout } from "~/hooks/api/auth"
 
 export type TabType = "forms" | "create" | "trash" | "submissions";
 
 export default function DashboardPage() {
     const [activeTab, setActiveTab] = useState<TabType>("forms");
     const { user, isLoading: isUserLoading } = useUser();
+    const { logoutAsync } = useLogout();
+    const router = useRouter();
+
+    const handleLogout = async () => {
+        try {
+            await logoutAsync();
+            router.push("/login");
+        } catch (error) {
+            console.error("Logout failed:", error);
+        }
+    };
 
     // Global Search & Filter State
     const [searchQuery, setSearchQuery] = useState("");
@@ -162,11 +174,11 @@ export default function DashboardPage() {
                                     <span>Settings</span>
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator className="bg-[#1E1E1E]/10 my-2" />
-                                <DropdownMenuItem asChild className="cursor-pointer rounded-[10px] font-bold text-red-600 focus:text-red-600 focus:bg-red-50">
-                                    <Link href="/auth/sign-in" className="w-full flex items-center">
+                                <DropdownMenuItem onClick={handleLogout} className="cursor-pointer rounded-[10px] font-bold text-red-600 focus:text-red-600 focus:bg-red-50">
+                                    <div className="w-full flex items-center">
                                         <LogOut className="mr-2 h-4 w-4" />
                                         <span>Log out</span>
-                                    </Link>
+                                    </div>
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>

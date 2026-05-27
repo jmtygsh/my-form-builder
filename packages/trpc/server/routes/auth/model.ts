@@ -56,3 +56,9 @@ export const resetPasswordInputModel = z.object({
 export const resetPasswordOutputModel = z.object({
     id: z.string().describe("ID of the user"),
 })
+
+export const logoutInputModel = z.void();
+
+export const logoutOutputModel = z.object({
+    success: z.boolean().describe("Whether logout was successful"),
+})
