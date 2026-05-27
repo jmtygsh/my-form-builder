@@ -8,11 +8,14 @@ const ONE_DAY = 24 * ONE_HOUR;
 const ONE_MONTH = 30 * ONE_DAY;
 const ONE_YEAR = 12 * ONE_MONTH;
 
+
+
 const defaultCookieOptions: CookieOptions = {
     path: "/",
     httpOnly: true,
-    secure: false,
-    sameSite: "strict",
+    secure: true,
+    sameSite: "none",
+    domain: ".makemyform.in",
     maxAge: ONE_YEAR
 };
 
@@ -40,8 +43,9 @@ export function clearCookieFactory(res: Response) {
         res.clearCookie(name, {
             path: "/",
             httpOnly: true,
-            secure: false,
-            sameSite: "strict",
+            secure: true,
+            sameSite: "none",
+            domain: ".makemyform.in",
         });
     }
 }
