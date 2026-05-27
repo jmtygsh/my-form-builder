@@ -22,7 +22,7 @@ app.use(
   cors({
     origin:
       env.NODE_ENV === "prod"
-        ? process.env.BASE_URL || ["https://www.makemyform.in", "https://makemyform.in"]
+        ? ["https://www.makemyform.in", "https://makemyform.in"]
         : "*",
     credentials: true,
   }),
