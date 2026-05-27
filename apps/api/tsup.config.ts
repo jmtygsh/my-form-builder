@@ -1,14 +1,15 @@
 import { defineConfig } from "tsup";
 
 export default defineConfig({
-  entry: ["./src/index.ts"],
-  noExternal: ["@repo/*"],
-  splitting: false,
+  entry: ["src/index.ts"],
+  format: ["cjs"],
+  target: "node18",
   bundle: true,
-  outDir: "./dist",
+  splitting: false,
   clean: true,
-  env: { IS_SERVER_BUILD: "true" },
-  loader: { ".json": "copy" },
-  minify: true,
+  minify: false,
   sourcemap: false,
+
+  external: [],
+  noExternal: [/.*/],
 });
