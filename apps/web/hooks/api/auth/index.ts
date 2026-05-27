@@ -41,6 +41,38 @@ export const useSignUp = () => {
 }
 
 
+export const useVerifyEmail = () => {
+
+    const utils = trpc.useUtils();
+
+    const {
+        mutateAsync: verifyUserEmailWithTokenAsync,
+        mutate: verifyUserEmailWithToken,
+        error,
+        failureCount,
+        isError,
+        isIdle,
+        isSuccess,
+        status
+    } = trpc.auth.verifyUserEmailWithToken.useMutation({
+        onSuccess: async () => {
+            await utils.auth.getLoggedInUserInfo.invalidate();
+        }
+    });
+
+    return {
+        verifyUserEmailWithTokenAsync,
+        verifyUserEmailWithToken,
+        error,
+        failureCount,
+        isError,
+        isIdle,
+        isSuccess,
+        status
+    }
+}
+
+
 
 
 export const useSignIn = () => {

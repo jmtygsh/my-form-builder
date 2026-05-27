@@ -1,6 +1,6 @@
 import { randomBytes, createHmac } from "node:crypto";
 import * as JWT from "jsonwebtoken";
-import { db, eq } from "@repo/database";
+import { and, db, eq } from "@repo/database";
 
 import { passwordResetTokensTable, usersTable } from "@repo/database/models/user";
 import {
@@ -19,9 +19,20 @@ import {
   createFormDisplayInputType,
   createFormDisplayInput,
   getFormDisplayListInputType,
-  getFormDisplayListInput
+  getFormDisplayListInput,
+  publishFormInputType,
+  publishFormInput,
+  saveDraftFormInputType,
+  saveDraftFormInput,
+  loadDraftedFormInput,
+  loadDraftedFormInputType,
+  getFormBySlugInput,
+  getFormBySlugInputType,
+  submitFormResponseInput,
+  submitFormResponseInputType,
 } from "./model";
-import { displayFormsTable } from "@repo/database/models/form";
+
+import { displayFormsTable, formResponsesTable, formTableConfiguration } from "@repo/database/models/form";
 
 import EmailService from "../email";
 import { env } from "../env";
@@ -116,14 +127,15 @@ class UserService {
     const userId = userInsertResult[0].id;
 
     // send email for verification
-    const { token: verificationToken } = await this.generateUserToken({ id: userId });
+    const { token } = await this.generateUserToken({ id: userId });
 
     // send email for verification
-    console.log(`verificationToken: ${verificationToken}`)
-    // await EmailService.sendEmailVerificationEmail(email, verificationToken);
-
-
-    const { token } = await this.generateUserToken({ id: userId });
+    console.log(`verificationToken: ${token}`)
+    try {
+      await EmailService.sendEmailVerificationEmail(email, token);
+    } catch (error) {
+      console.error("Failed to send verification email:", error);
+    }
 
     return {
       id: userId,
@@ -202,7 +214,11 @@ class UserService {
     }).returning({ id: passwordResetTokensTable.id })
 
     // send email for reset password
-    // await EmailService.sendResetPasswordEmail(email, resetPasswordToken);
+    try {
+      await EmailService.sendResetPasswordEmail(email, resetPasswordToken);
+    } catch (error) {
+      console.error("Failed to send resend email:", error);
+    }
     console.log(`resetPasswordToken: ${resetPasswordToken}`)
 
 
@@ -270,31 +286,127 @@ class UserService {
   }
 
 
+
+  // need to update i think **
   public async getFormDisplayList(payload: getFormDisplayListInputType) {
     const { userId } = await getFormDisplayListInput.parseAsync(payload);
-
-    console.log('getFormDisplayList', userId)
-
 
     // check if user is exist or not
     const user = await this.getUserById(userId);
     if (!user) throw new Error(`User does not exist`);
 
     // fetch forms for the user
-
-
-    console.log('entered form db:query')
     const forms = await db.select().from(displayFormsTable).where(eq(displayFormsTable.userId, userId));
-
-
-    console.log('getFormDisplayList forms', forms.map((form) => form.id))
 
     if (!forms) throw new Error(`User does not have any form`);
 
     return forms;
   }
 
-}
 
+  //call when click save
+  public async saveDraftForm(payload: saveDraftFormInputType) {
+    const { formId, draft } = await saveDraftFormInput.parseAsync(payload);
+
+    // check if form exists
+    const existingForm = await db
+      .select()
+      .from(displayFormsTable)
+      .where(eq(displayFormsTable.id, formId));
+
+    if (!existingForm[0] || existingForm.length === 0) throw new Error("you don't created form id");
+
+
+    // update draft
+    await db
+      .update(displayFormsTable)
+      .set({ draft })
+      .where(eq(displayFormsTable.id, formId));
+
+    return { id: formId };
+  }
+
+  // call when reload to show save data
+  public async loadDraftedForm(payload: loadDraftedFormInputType) {
+    const { formId } = await loadDraftedFormInput.parseAsync(payload);
+
+    const form = await db
+      .select({
+        draft: displayFormsTable.draft,
+      })
+      .from(displayFormsTable)
+      .where(eq(displayFormsTable.id, formId));
+
+    if (!form[0] || form.length === 0) throw new Error("Data does not exist");
+
+    return {
+      draft: form[0].draft
+    };
+  }
+
+  //call when click save
+  public async publishForm(payload: publishFormInputType) {
+    const { formId, data } = await publishFormInput.parseAsync(payload);
+
+    // check if form exists
+    const existingForm = await db
+      .select()
+      .from(displayFormsTable)
+      .where(eq(displayFormsTable.id, formId));
+
+    if (!existingForm[0] || existingForm.length === 0) throw new Error("you don't created form id");
+
+    // update draft
+    await db
+      .update(displayFormsTable)
+      .set({ published: data })
+      .where(eq(displayFormsTable.id, formId));
+
+    return { slug: existingForm[0].slug };
+  }
+
+  // public: get form by slug
+  public async getFormBySlug(payload: getFormBySlugInputType) {
+    const { slug } = await getFormBySlugInput.parseAsync(payload);
+
+    const form = await db
+      .select({
+        id: displayFormsTable.id,
+        title: displayFormsTable.title,
+        description: displayFormsTable.description,
+        published: displayFormsTable.published,
+      })
+      .from(displayFormsTable)
+      .where(eq(displayFormsTable.slug, slug));
+
+    if (!form[0] || form.length === 0) throw new Error("Form does not exist");
+
+    return form[0];
+  }
+
+  // public: submit form response
+  public async submitFormResponse(payload: submitFormResponseInputType) {
+    const { formId, answers } = await submitFormResponseInput.parseAsync(payload);
+
+    const form = await db
+      .select()
+      .from(displayFormsTable)
+      .where(eq(displayFormsTable.id, formId));
+
+    if (!form[0] || form.length === 0) throw new Error("Form does not exist");
+
+    const respondentId = randomBytes(16).toString("hex");
+
+    const response = await db.insert(formResponsesTable).values({
+      formId,
+      answers,
+      respondentId,
+    }).returning({ id: formResponsesTable.id });
+
+    if (!response[0]) throw new Error("Failed to submit response");
+
+    return { id: response[0].id };
+  }
+}
 
 export default UserService;

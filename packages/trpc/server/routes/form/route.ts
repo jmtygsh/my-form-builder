@@ -1,9 +1,10 @@
 import { userService } from "../../services";
 
 
-import { protectedProcedure, router } from "../../trpc";
+import { protectedProcedure, publicProcedure, router } from "../../trpc";
 import { generatePath } from "../../utils/path-generator";
-import { createNewFormInputModel, createNewFormOutputModel, getFormDisplayListInputModel, getFormDisplayListOutputModel } from "./model";
+import { z } from "zod";
+import { createNewFormInputModel, createNewFormOutputModel, getFormDisplayListInputModel, getFormDisplayListOutputModel, loadDraftedFormInputModel, loadDraftedFormOutputModel, publishFormInputModel, publishFormOutputModel, saveDraftFormInputModel, saveDraftFormOutputModel, formDraftSchema, getFormBySlugInputModel, getFormBySlugOutputModel, submitFormResponseInputModel, submitFormResponseOutputModel } from "./model";
 
 const TAGS = ["Form"];
 const getPath = generatePath("/form");
@@ -11,7 +12,7 @@ const getPath = generatePath("/form");
 export const formRouter = router({
 
     createNewForm: protectedProcedure
-        .meta({ openapi: { method: "POST", path: getPath("/createNewForm"), tags: TAGS } })
+        .meta({ openapi: { method: "POST", path: getPath("/create-new-form"), tags: TAGS } })
         .input(createNewFormInputModel)
         .output(createNewFormOutputModel)
         .mutation(async ({ input, ctx }) => {
@@ -24,13 +25,64 @@ export const formRouter = router({
         }),
 
 
+    // showing all forms found 
     getFormDisplayList: protectedProcedure
-        .meta({ openapi: { method: "GET", path: getPath("/getFormDisplayList"), tags: TAGS } })
+        .meta({ openapi: { method: "GET", path: getPath("/get-form-display-list"), tags: TAGS } })
         .input(getFormDisplayListInputModel)
         .output(getFormDisplayListOutputModel)
         .query(async ({ ctx }) => {
             const forms = await userService.getFormDisplayList({ userId: ctx.user.id as string });
             return forms;
+        }),
+
+
+    saveDraftForm: protectedProcedure
+        .meta({ openapi: { method: "POST", path: getPath("/save-draft-form"), tags: TAGS } })
+        .input(saveDraftFormInputModel)
+        .output(saveDraftFormOutputModel)
+        .mutation(async ({ input }) => {
+            const result = await userService.saveDraftForm(input);
+            return { id: result.id };
+        }),
+
+
+    loadDraftedForm: protectedProcedure
+        .meta({ openapi: { method: "GET", path: getPath("/get-drafted-form"), tags: TAGS } })
+        .input(loadDraftedFormInputModel)
+        .output(loadDraftedFormOutputModel)
+        .query(async ({ input }) => {
+            const result = await userService.loadDraftedForm(input);
+            return {
+                draft: result.draft
+            }
+        }),
+
+
+    publishForm: protectedProcedure
+        .meta({ openapi: { method: "POST", path: getPath("/publish-form"), tags: TAGS } })
+        .input(publishFormInputModel)
+        .output(publishFormOutputModel)
+        .mutation(async ({ input }) => {
+            const result = await userService.publishForm(input);
+            return { slug: result.slug };
+        }),
+
+    getFormBySlug: publicProcedure
+        .meta({ openapi: { method: "GET", path: getPath("/getFormBySlug"), tags: TAGS } })
+        .input(getFormBySlugInputModel)
+        .output(getFormBySlugOutputModel)
+        .query(async ({ input }) => {
+            const result = await userService.getFormBySlug(input);
+            return result;
+        }),
+
+    submitFormResponse: publicProcedure
+        .meta({ openapi: { method: "POST", path: getPath("/submit-form-response"), tags: TAGS } })
+        .input(submitFormResponseInputModel)
+        .output(submitFormResponseOutputModel)
+        .mutation(async ({ input }) => {
+            const result = await userService.submitFormResponse(input);
+            return { id: result.id };
         }),
 
 });

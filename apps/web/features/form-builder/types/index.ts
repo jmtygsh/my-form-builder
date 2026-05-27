@@ -63,7 +63,6 @@ export interface FormProps {
 }
 
 export interface FormSchema {
-  id: string;
   name: string;
   rows: Row[];
   props?: FormProps;

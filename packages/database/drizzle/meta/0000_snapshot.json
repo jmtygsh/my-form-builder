@@ -1,5 +1,5 @@
 {
-  "id": "1fd0811f-e703-4fbc-ad01-d3bf077ab3fa",
+  "id": "cd8bc5a2-0d83-4c21-8d69-ffd5d74aa62f",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -188,6 +188,20 @@
           "primaryKey": false,
           "notNull": true
         },
+        "draft": {
+          "name": "draft",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'{\"name\":\"Untitled Form\",\"rows\":[]}'::jsonb"
+        },
+        "published": {
+          "name": "published",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'{\"name\":\"Untitled Form\",\"rows\":[]}'::jsonb"
+        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp",
@@ -228,109 +242,6 @@
           ]
         }
       },
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.form_payload": {
-      "name": "form_payload",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "form_id": {
-          "name": "form_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "title": {
-          "name": "title",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "description": {
-          "name": "description",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "type": {
-          "name": "type",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "label": {
-          "name": "label",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "placeholder": {
-          "name": "placeholder",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "required": {
-          "name": "required",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true,
-          "default": false
-        },
-        "ordered": {
-          "name": "ordered",
-          "type": "real",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "properties": {
-          "name": "properties",
-          "type": "jsonb",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "'{}'::jsonb"
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "form_payload_form_id_display_forms_id_fk": {
-          "name": "form_payload_form_id_display_forms_id_fk",
-          "tableFrom": "form_payload",
-          "tableTo": "display_forms",
-          "columnsFrom": [
-            "form_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -411,12 +322,6 @@
           "primaryKey": false,
           "notNull": true
         },
-        "theme_name": {
-          "name": "theme_name",
-          "type": "varchar(100)",
-          "primaryKey": false,
-          "notNull": false
-        },
         "visibility": {
           "name": "visibility",
           "type": "visibility",
@@ -424,13 +329,6 @@
           "primaryKey": false,
           "notNull": true,
           "default": "'unpublished'"
-        },
-        "properties": {
-          "name": "properties",
-          "type": "jsonb",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "'{}'::jsonb"
         },
         "protected": {
           "name": "protected",

@@ -4,7 +4,7 @@ import { env } from "../env";
 class EmailService {
 
     public static async sendEmailVerificationEmail(email: string, token: string) {
-        const verificationUrl = `${env.BASE_URL}/verify-email?token=${token}`;
+        const verificationUrl = `${env.BASE_URL}/verify?token=${token}`;
 
         const subject = "Verify your email address";
         const html = `

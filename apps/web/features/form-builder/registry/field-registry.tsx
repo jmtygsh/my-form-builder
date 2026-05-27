@@ -114,7 +114,7 @@ const SelectCanvasComponent = ({ field, isLive }: { field: Field; isLive?: boole
     <Label className="text-sm font-medium">
       {field.props.label} {field.props.required && <span className="text-destructive">*</span>}
     </Label>
-    <Select disabled={!isLive}>
+    <Select disabled={!isLive} name={field.id}>
       <SelectTrigger className={!isLive ? "pointer-events-none" : ""}>
         <SelectValue placeholder={field.props.placeholder || "Select an option..."} />
       </SelectTrigger>
@@ -137,6 +137,7 @@ const DateCanvasComponent = ({ field, isLive }: { field: Field; isLive?: boolean
     </Label>
     <Input
       type="date"
+      name={field.id}
       placeholder={field.props.placeholder}
       readOnly={!isLive}
       className={!isLive ? "pointer-events-none w-full" : "w-full"}
@@ -155,7 +156,7 @@ const CheckboxGroupCanvasComponent = ({ field, isLive }: { field: Field; isLive?
     <div className={`flex flex-col gap-2 ${!isLive ? "pointer-events-none" : ""}`}>
       {field.props.options?.map((opt, i) => (
         <div key={i} className="flex items-center space-x-2">
-          <Checkbox id={`cbg-${field.id}-${i}`} disabled={!isLive} />
+          <Checkbox id={`cbg-${field.id}-${i}`} name={field.id} value={opt} disabled={!isLive} />
           <Label htmlFor={`cbg-${field.id}-${i}`}>{opt}</Label>
         </div>
       ))}
@@ -169,7 +170,7 @@ const CheckboxGroupCanvasComponent = ({ field, isLive }: { field: Field; isLive?
 const CheckboxCanvasComponent = ({ field, isLive }: { field: Field; isLive?: boolean }) => (
   <div className="flex flex-col gap-2 w-full pt-1">
     <div className="flex items-center space-x-2">
-      <Checkbox id={`cb-${field.id}`} disabled={!isLive} className={!isLive ? "pointer-events-none" : ""} />
+      <Checkbox id={`cb-${field.id}`} name={field.id} value="true" disabled={!isLive} className={!isLive ? "pointer-events-none" : ""} />
       <Label htmlFor={`cb-${field.id}`} className="text-sm font-medium leading-none">
         {field.props.label} {field.props.required && <span className="text-destructive">*</span>}
       </Label>
@@ -185,7 +186,7 @@ const RadioCanvasComponent = ({ field, isLive }: { field: Field; isLive?: boolea
     <Label className="text-sm font-medium">
       {field.props.label} {field.props.required && <span className="text-destructive">*</span>}
     </Label>
-    <RadioGroup disabled={!isLive} className={!isLive ? "pointer-events-none" : ""}>
+    <RadioGroup name={field.id} disabled={!isLive} className={!isLive ? "pointer-events-none" : ""}>
       {field.props.options?.map((opt, i) => (
         <div key={i} className="flex items-center space-x-2">
           <RadioGroupItem value={opt} id={`radio-${field.id}-${i}`} />
@@ -254,6 +255,7 @@ const FileCanvasComponent = ({ field, isLive }: { field: Field; isLive?: boolean
         <input
           ref={fileInputRef}
           type="file"
+          name={field.id}
           className="hidden"
           accept={field.props.allowedFileTypes?.join(",")}
           onChange={handleFileChange}
@@ -274,9 +276,11 @@ const TextCanvasComponent = ({ field, isLive }: { field: Field; isLive?: boolean
       {field.props.label} {field.props.required && <span className="text-destructive">*</span>}
     </Label>
     <Input
+      name={field.id}
       placeholder={field.props.placeholder}
       readOnly={!isLive}
       className={!isLive ? "pointer-events-none" : ""}
+      required={field.props.required}
     />
     {field.props.description && (
       <p className="text-xs text-muted-foreground">{field.props.description}</p>
@@ -290,9 +294,11 @@ const TextareaCanvasComponent = ({ field, isLive }: { field: Field; isLive?: boo
       {field.props.label} {field.props.required && <span className="text-destructive">*</span>}
     </Label>
     <Textarea
+      name={field.id}
       placeholder={field.props.placeholder}
       readOnly={!isLive}
       className={!isLive ? "pointer-events-none resize-none" : "resize-y"}
+      required={field.props.required}
     />
     {field.props.description && (
       <p className="text-xs text-muted-foreground">{field.props.description}</p>

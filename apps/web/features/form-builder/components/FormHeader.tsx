@@ -1,7 +1,8 @@
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { ChevronLeft, Rows3, LayoutTemplate } from "lucide-react";
+import { ChevronLeft, Rows3, LayoutTemplate, Loader2 } from "lucide-react";
 import { useBuilderStore } from "../store/useBuilderStore";
+import { toast } from "sonner";
 
 import { Button } from "~/components/ui/button";
 import {
@@ -13,7 +14,7 @@ import {
 interface HeaderProps {
     viewMode: "edit" | "preview";
     setViewMode: React.Dispatch<React.SetStateAction<"edit" | "preview">>;
-    onSaveFn: () => void;
+    onSaveFn: () => void,
     onPublishFn: () => void;
 }
 
@@ -25,6 +26,9 @@ export function FormHeader({
 }: HeaderProps) {
     const router = useRouter();
     const { selectRow, selectCanvas, form, selectedRowId, selectedCanvas } = useBuilderStore();
+
+
+
 
     return (
         <header className="bg-card border-border/60 flex h-14 items-center justify-between border-b px-4">
@@ -48,7 +52,10 @@ export function FormHeader({
                         onClick={() => {
                             // If a row is already selected, keep it, otherwise select the first row or fallback
                             if (!selectedRowId && form.rows.length > 0) {
-                                selectRow(form.rows[0].id);
+                                const firstRow = form.rows[0];
+                                if (firstRow) {
+                                    selectRow(firstRow.id);
+                                }
                             } else if (!selectedRowId) {
                                 // If no rows exist, just trigger row selection (it will show empty state)
                                 selectRow("empty");

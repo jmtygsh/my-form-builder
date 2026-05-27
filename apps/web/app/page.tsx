@@ -25,16 +25,16 @@ import { Footer } from "~/components/layout/Footer";
 
 
 export default function Home() {
-  const { user } = useUser()
+  // const { user } = useUser()
 
 
   // ignore for now
-  useEffect(() => {
-    if (user && user.id) {
-      console.log(user)
-      // redirect('/redirect-to', RedirectType.replace)
-    }
-  }, [user])
+  // useEffect(() => {
+  //   if (user && user.id) {
+  //     console.log(user)
+  //     // redirect('/redirect-to', RedirectType.replace)
+  //   }
+  // }, [user])
 
 
   return (

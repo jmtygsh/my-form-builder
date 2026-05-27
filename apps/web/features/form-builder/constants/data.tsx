@@ -23,7 +23,7 @@ export const VIEW_MODE_BUTTON: TabOption<"edit" | "preview">[] = [
 export const SUBMIT_BUTTON: TabOption<"save" | "publish">[] = [
     {
         id: "save",
-        label: "Save",
+        label: "Save Draft",
         icon: <Save className="size-4" />
     },
     {

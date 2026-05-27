@@ -31,16 +31,15 @@ interface BuilderState {
   moveFieldToNewRow: (fieldId: string, toRowIndex: number) => void;
 
   // Persist Actions
-  loadFromLocalStorage: (id: string) => void;
   clearPersistedState: (id: string) => void;
 }
 
 export const useBuilderStore = create<BuilderState>((set) => ({
   form: {
-    id: "form_1",
     name: "Untitled Form",
     rows: [],
   },
+
   selectedFieldId: null,
   selectedRowId: null,
   selectedCanvas: false,
@@ -237,20 +236,7 @@ export const useBuilderStore = create<BuilderState>((set) => ({
     };
   }),
 
-  loadFromLocalStorage: (id) => set((state) => {
-    if (typeof window !== "undefined") {
-      const saved = localStorage.getItem(`form-builder-storage-${id}`);
-      if (saved) {
-        try {
-          const parsed = JSON.parse(saved);
-          return { form: parsed };
-        } catch (e) {
-          console.error("Failed to parse form from local storage", e);
-        }
-      }
-    }
-    return state;
-  }),
+
 
   clearPersistedState: (id) => set((state) => {
     if (typeof window !== "undefined") {

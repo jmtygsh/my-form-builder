@@ -1,3 +1,4 @@
+import { relations } from "drizzle-orm";
 import {
     pgTable,
     uuid,
@@ -12,9 +13,25 @@ import {
 } from "drizzle-orm/pg-core";
 import { usersTable } from "./user";
 
-
 export const visibilityEnum = pgEnum("visibility", ["public", "unlisted", "unpublished"]);
 
+// --- Shared Types & Constants ---
+export type FormPayload = {
+    name: string;
+    rows: {
+        id: string;
+        fields: {
+            id: string;
+            type: string;
+            props: Record<string, any>;
+        }[];
+    }[];
+};
+
+export const defaultFormPayload: FormPayload = {
+    name: "Untitled Form",
+    rows: []
+};
 
 // internal title & description 
 export const displayFormsTable = pgTable("display_forms", {
@@ -27,37 +44,15 @@ export const displayFormsTable = pgTable("display_forms", {
 
     slug: varchar("slug", { length: 255 }).notNull().unique(),
 
+    draft: jsonb("draft").$type<FormPayload>().default(defaultFormPayload),
+
+    published: jsonb("published").$type<FormPayload>().default(defaultFormPayload),
+
     // Timestamps for audit trails
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").$onUpdate(() => new Date()),
 });
 
-// actual form payload table
-export const formPayloadTable = pgTable("form_payload", {
-    id: uuid("id").primaryKey().defaultRandom(),
-    formId: uuid("form_id")
-        .references(() => displayFormsTable.id, { onDelete: "cascade" })
-        .notNull(),
-
-    title: varchar("title", { length: 255 }).notNull(), //form title
-    description: text("description"),
-
-    // e.g., 'short_text', 'number', 'dropdown'. Validated by Zod at app level.
-    type: varchar("type", { length: 255 }).notNull(),
-
-    label: text("label").notNull(),
-    placeholder: text("placeholder"),
-    required: boolean("required").default(false).notNull(),
-
-    // Fractional indexing (e.g., 1.5) for drag-and-drop ordering
-    ordered: real("ordered").notNull(),
-
-    // JSONB for type-specific configs (options for dropdowns, min/max limits, etc.)
-    properties: jsonb("properties").default({}),
-
-    createdAt: timestamp("created_at").defaultNow().notNull(),
-    updatedAt: timestamp("updated_at").$onUpdate(() => new Date()),
-});
 
 // actual form table configuration table
 export const formTableConfiguration = pgTable("form_table_configuration", {
@@ -65,9 +60,8 @@ export const formTableConfiguration = pgTable("form_table_configuration", {
     formId: uuid("form_id")
         .references(() => displayFormsTable.id, { onDelete: "cascade" })
         .notNull(),
-    themeName: varchar("theme_name", { length: 100 }),
+    // themeName: varchar("theme_name", { length: 100 }),
     visibility: visibilityEnum("visibility").default("unpublished").notNull(),
-    properties: jsonb("properties").default({}), // extensible bucket for the entire form.
     protected: boolean("protected").default(false),
     password: varchar("password", { length: 255 }).default(""),
     expiry: timestamp("expiry"),
@@ -76,8 +70,8 @@ export const formTableConfiguration = pgTable("form_table_configuration", {
 
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").$onUpdate(() => new Date()),
+});
 
-})
 
 // actual form responses table
 export const formResponsesTable = pgTable("form_responses", {
@@ -101,12 +95,35 @@ export const formResponsesTable = pgTable("form_responses", {
 });
 
 
+// --- Relations ---
+
+export const displayFormsRelations = relations(displayFormsTable, ({ one, many }) => ({
+    user: one(usersTable, {
+        fields: [displayFormsTable.userId],
+        references: [usersTable.id],
+    }),
+    configuration: one(formTableConfiguration),
+    responses: many(formResponsesTable),
+}));
+
+export const formTableConfigurationRelations = relations(formTableConfiguration, ({ one }) => ({
+    form: one(displayFormsTable, {
+        fields: [formTableConfiguration.formId],
+        references: [displayFormsTable.id],
+    }),
+}));
+
+export const formResponsesRelations = relations(formResponsesTable, ({ one }) => ({
+    form: one(displayFormsTable, {
+        fields: [formResponsesTable.formId],
+        references: [displayFormsTable.id],
+    }),
+}));
+
+
 // --- Types ---
 export type SelectForm = typeof displayFormsTable.$inferSelect;
 export type InsertForm = typeof displayFormsTable.$inferInsert;
-
-export type SelectFormField = typeof formPayloadTable.$inferSelect;
-export type InsertFormField = typeof formPayloadTable.$inferInsert;
 
 export type SelectFormResponse = typeof formResponsesTable.$inferSelect;
 export type InsertFormResponse = typeof formResponsesTable.$inferInsert;

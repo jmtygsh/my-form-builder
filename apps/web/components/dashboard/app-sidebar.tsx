@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { FolderPlus, Archive, Trash2, Users, Send } from "lucide-react"
+import { FolderPlus, Archive, Trash2, Send } from "lucide-react"
 
 import {
   Sidebar,
@@ -12,9 +12,10 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "~/components/ui/sidebar"
-import { Button } from "~/components/ui/button"
 
-export type TabType = "forms" | "create" | "archive" | "trash" | "team" | "submissions";
+
+
+export type TabType = "forms" | "create" | "trash" | "team" | "submissions";
 
 // Menu items.
 const items: { title: string; id: TabType; icon: any; badge?: string }[] = [
@@ -27,33 +28,27 @@ const items: { title: string; id: TabType; icon: any; badge?: string }[] = [
     title: "Create a new form",
     id: "create",
     icon: FolderPlus,
-  },
+  }
+
 ]
 
 const middleItems: { title: string; id: TabType; icon: any; badge?: string }[] = [
+
   {
-    title: "Archive",
-    id: "archive",
-    icon: Archive,
+    title: "My Submissions",
+    id: "submissions",
+    icon: Send,
   },
+
+]
+
+const bottomItems: { title: string; id: TabType; icon: any; badge?: string }[] = [
+
   {
     title: "Trash",
     id: "trash",
     icon: Trash2,
     badge: "(1)"
-  },
-]
-
-const bottomItems: { title: string; id: TabType; icon: any; badge?: string }[] = [
-  {
-    title: "Team Members",
-    id: "team",
-    icon: Users,
-  },
-  {
-    title: "My Submissions",
-    id: "submissions",
-    icon: Send,
   },
 ]
 
@@ -66,28 +61,22 @@ export function AppSidebar({ activeTab, onTabChange }: AppSidebarProps) {
   return (
     <Sidebar className="border-r-0 pt-4 bg-transparent top-16 h-[calc(100vh-64px)]" collapsible="none">
       <SidebarContent className="px-4 gap-6">
-        {/* <Button
-          className="w-full bg-button hover:bg-button-hover text-button-foreground rounded-lg h-11 shadow-sm font-medium"
-          onClick={() => onTabChange("create")}
-        >
-          Create a new form
-        </Button> */}
-
         <SidebarGroup className="p-0">
           <SidebarGroupContent>
             <SidebarMenu className="gap-2">
-              {items.map((item) => (
+              {items.map((item) =>
                 <SidebarMenuItem key={item.id}>
                   <SidebarMenuButton
                     isActive={activeTab === item.id}
                     onClick={() => onTabChange(item.id)}
-                    className="cursor-pointer h-11 px-4 rounded-lg data-[active=true]:bg-background data-[active=true]:shadow-sm data-[active=true]:text-foreground font-medium text-muted-foreground hover:bg-background/50"
+                    className="cursor-pointer h-11 px-4 rounded-xl data-[active=true]:bg-primary/10 data-[active=true]:text-primary font-medium text-foreground-muted hover:bg-background-secondary transition-colors"
                   >
                     <item.icon className="w-4 h-4 mr-3" />
                     <span>{item.title}</span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
-              ))}
+
+              )}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
@@ -102,13 +91,13 @@ export function AppSidebar({ activeTab, onTabChange }: AppSidebarProps) {
                   <SidebarMenuButton
                     isActive={activeTab === item.id}
                     onClick={() => onTabChange(item.id)}
-                    className="cursor-pointer h-11 px-4 rounded-lg data-[active=true]:bg-background data-[active=true]:shadow-sm data-[active=true]:text-foreground font-medium text-muted-foreground hover:bg-background/50 flex justify-between"
+                    className="cursor-pointer h-11 px-4 rounded-xl data-[active=true]:bg-primary/10 data-[active=true]:text-primary font-medium text-foreground-muted hover:bg-background-secondary transition-colors flex justify-between"
                   >
                     <div className="flex items-center">
                       <item.icon className="w-4 h-4 mr-3" />
                       <span>{item.title}</span>
                     </div>
-                    {item.badge && <span className="text-xs font-semibold">{item.badge}</span>}
+
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
@@ -127,10 +116,11 @@ export function AppSidebar({ activeTab, onTabChange }: AppSidebarProps) {
               <SidebarMenuButton
                 isActive={activeTab === item.id}
                 onClick={() => onTabChange(item.id)}
-                className="cursor-pointer h-11 px-4 rounded-lg data-[active=true]:bg-background data-[active=true]:shadow-sm data-[active=true]:text-foreground font-medium text-muted-foreground hover:bg-background/50"
+                className="cursor-pointer h-11 px-4 rounded-xl data-[active=true]:bg-primary/10 data-[active=true]:text-primary font-medium text-foreground-muted hover:bg-background-secondary transition-colors"
               >
                 <item.icon className="w-4 h-4 mr-3" />
                 <span>{item.title}</span>
+                {item.badge && <span className="text-xs font-semibold">{item.badge}</span>}
               </SidebarMenuButton>
             </SidebarMenuItem>
           ))}

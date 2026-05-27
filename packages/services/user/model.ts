@@ -59,3 +59,55 @@ export const getFormDisplayListInput = z.object({
 })
 export type getFormDisplayListInputType = z.infer<typeof getFormDisplayListInput>;
 
+
+
+// form draft common 
+export const formDraftSchema = z.object({
+  name: z.string(),
+  rows: z.array(z.object({
+    id: z.string(),
+    fields: z.array(z.object({
+      id: z.string(),
+      type: z.string(),
+      props: z.record(z.string(), z.any()),
+    }))
+  }))
+});
+
+
+// save drafted form 
+export const saveDraftFormInput = z.object({
+  formId: z.string().describe("uuid of the form"),
+  draft: formDraftSchema.describe("json representation of the draft builder state"),
+})
+export type saveDraftFormInputType = z.infer<typeof saveDraftFormInput>;
+
+// get drafted form
+export const loadDraftedFormInput = z.object({
+  formId: z.string().describe("uuid of the form")
+})
+export type loadDraftedFormInputType = z.infer<typeof loadDraftedFormInput>;
+
+
+// derfated to publish
+export const publishFormInput = z.object({
+  formId: z.string().describe("uuid of the form"),
+  data: formDraftSchema.describe("json representation of the publish state"),
+})
+export type publishFormInputType = z.infer<typeof publishFormInput>;
+
+export const getFormBySlugInput = z.object({
+  slug: z.string().describe("slug of the form")
+});
+export type getFormBySlugInputType = z.infer<typeof getFormBySlugInput>;
+
+export const submitFormResponseInput = z.object({
+  formId: z.string().describe("uuid of the form"),
+  answers: z.record(z.string(), z.any()).describe("answers submitted by the respondent"),
+});
+export type submitFormResponseInputType = z.infer<typeof submitFormResponseInput>;
+
+//end form draft common 
+
+
+

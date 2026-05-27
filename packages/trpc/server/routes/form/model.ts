@@ -20,3 +20,73 @@ export const getFormDisplayListOutputModel = z.array(z.object({
     description: z.string().nullable(),
     slug: z.string(),
 }));
+
+
+
+// common type for input & output
+export const formDraftSchema = z.object({
+    name: z.string(),
+    rows: z.array(z.object({
+        id: z.string(),
+        fields: z.array(z.object({
+            id: z.string(),
+            type: z.string(),
+            props: z.record(z.string(), z.any()),
+        }))
+    }))
+});
+
+export const saveDraftFormInputModel = z.object({
+    formId: z.string().describe("uuid of the form"),
+    draft: formDraftSchema.describe("json representation of the draft builder state"),
+})
+
+export const saveDraftFormOutputModel = z.object({
+    id: z.string(),
+})
+
+
+
+export const loadDraftedFormInputModel = z.object({
+    formId: z.string().describe("uuid of the form")
+})
+
+export const loadDraftedFormOutputModel = z.object({
+    draft: formDraftSchema.nullable(),
+})
+
+
+
+export const publishFormInputModel = z.object({
+    formId: z.string().describe("uuid of the form"),
+    data: formDraftSchema.describe("json representation of the data builder state"),
+})
+
+export const publishFormOutputModel = z.object({
+    slug: z.string(),
+});
+
+
+export const getFormBySlugInputModel = z.object({
+    slug: z.string().describe("slug of the form")
+});
+
+export const getFormBySlugOutputModel = z.object({
+    id: z.string(),
+    title: z.string(),
+    description: z.string().nullable(),
+    published: formDraftSchema.nullable(),
+});
+
+
+
+export const submitFormResponseInputModel = z.object({
+    formId: z.string().describe("uuid of the form"),
+    answers: z.record(z.string(), z.any()).describe("answers submitted by the respondent"),
+});
+
+export const submitFormResponseOutputModel = z.object({
+    id: z.string(),
+});
+
+
