@@ -25,9 +25,22 @@ const openApiDocument = generateOpenApiDocument(serverRouter, {
 //     }),
 //   );
 // } else {
+const allowedOrigins = [
+  env.FRONTEND_URL,
+];
+
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps or curl requests)
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.indexOf(origin) !== -1 || env.NODE_ENV !== "prod") {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true
   }),
 );

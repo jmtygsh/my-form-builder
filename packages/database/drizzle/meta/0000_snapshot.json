@@ -1,5 +1,5 @@
 {
-  "id": "cd8bc5a2-0d83-4c21-8d69-ffd5d74aa62f",
+  "id": "30ab9f07-7836-48ff-8c2c-902990e4e20d",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -201,6 +201,13 @@
           "primaryKey": false,
           "notNull": false,
           "default": "'{\"name\":\"Untitled Form\",\"rows\":[]}'::jsonb"
+        },
+        "is_deleted": {
+          "name": "is_deleted",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
         },
         "created_at": {
           "name": "created_at",

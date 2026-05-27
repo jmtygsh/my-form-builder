@@ -30,6 +30,7 @@ CREATE TABLE "display_forms" (
 	"slug" varchar(255) NOT NULL,
 	"draft" jsonb DEFAULT '{"name":"Untitled Form","rows":[]}'::jsonb,
 	"published" jsonb DEFAULT '{"name":"Untitled Form","rows":[]}'::jsonb,
+	"is_deleted" boolean DEFAULT false NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp,
 	CONSTRAINT "display_forms_slug_unique" UNIQUE("slug")
