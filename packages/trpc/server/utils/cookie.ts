@@ -13,9 +13,8 @@ const ONE_YEAR = 12 * ONE_MONTH;
 const defaultCookieOptions: CookieOptions = {
     path: "/",
     httpOnly: true,
-    secure: true,
-    sameSite: "none",
-    domain: ".makemyform.in",
+    secure: false,
+    sameSite: "strict",
     maxAge: ONE_YEAR
 };
 
