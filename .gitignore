@@ -25,6 +25,7 @@ coverage
 .next/
 out/
 build
+!apps/web/app/dashboard/form/build/
 dist
 
 
