@@ -1,0 +1,33 @@
+name: Deploy
+
+on:
+push:
+branches:
+- main
+
+jobs:
+deploy:
+runs-on: ubuntu-latest
+
+```
+steps:
+  - name: Deploy to Droplet
+    uses: appleboy/ssh-action@v1.2.0
+    with:
+      host: ${{ secrets.HOST }}
+      username: ${{ secrets.USERNAME }}
+      key: ${{ secrets.SSH_KEY }}
+      script: |
+        cd /var/www/my-form-builder
+
+        git pull origin main
+
+        pnpm install
+
+        chmod +x setup.sh
+        ./setup.sh
+
+        pnpm turbo build
+
+        pm2 restart all
+```
