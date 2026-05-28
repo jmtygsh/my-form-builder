@@ -18,15 +18,14 @@ const openApiDocument = generateOpenApiDocument(serverRouter, {
   baseUrl: env.BASE_URL.concat("/api"),
 });
 
-app.use(
-  cors({
-    origin:
-      env.NODE_ENV === "prod"
-        ? ["https://www.makemyform.in", "https://makemyform.in"]
-        : "*",
-    credentials: true,
-  }),
-);
+app.use(cors({
+  origin: [
+    "https://makemyform.in",
+    "https://www.makemyform.in",
+  ],
+  credentials: true,
+}));
+
 
 app.use(cookieParser());
 app.use(express.json());
